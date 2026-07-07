@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-24
+lastUpdated: 2026-07-07
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -199,6 +199,23 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### The /plugins Dashboard
+
+*(v1.0.69+)* Inside an interactive Copilot CLI session, the `/plugins` command opens a full **plugins dashboard** where you can browse, enable, disable, and uninstall plugins without leaving your session:
+
+```
+/plugins          # open the plugins dashboard
+/plugin list      # list installed plugins (also works mid-turn)
+```
+
+The dashboard gives you a live view of all installed plugins and their status. You can also run `/plugin list` **while the agent is working** — unlike most management commands, it doesn't require the agent to be idle, making it useful for quick inspection during long-running tasks.
+
+> **Hot-reload**: When you install or update a plugin, its **extensions** (canvas extensions and IDE integrations) are reloaded immediately — no CLI restart required. Agent components (agents, skills, hooks) are also available in new sessions without restarting.
+
+### Duplicate MCP Server Warning
+
+If two installed plugins both define an MCP server with the same name, Copilot CLI will show a warning to alert you to the conflict. The server from the first-loaded plugin takes precedence. Review `/plugins` to identify which plugins are contributing conflicting servers, and disable or uninstall the one you don't need.
 
 ### Loading Plugins from a Local Directory
 
