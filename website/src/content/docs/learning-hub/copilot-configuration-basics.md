@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-09
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -277,6 +277,35 @@ When writing TypeScript code:
 ```
 
 **When to use**: For project-wide coding standards, architectural patterns, or technology-specific conventions that should influence all suggestions.
+
+### Repository CLI Settings *(v1.0.70+)*
+
+Trusted repositories can control certain GitHub Copilot CLI behaviors at the repo level by committing a `.github/copilot/settings.json` file. This file lets repository maintainers pin default settings for everyone working in that repo from the CLI, without requiring each developer to configure individually.
+
+**Supported controls**:
+- **Pin the model** — enforce a specific model for all CLI sessions in this repository
+- **Pin reasoning effort** — set the default effort level (`low`, `medium`, `high`)
+- **Set context tier** — control the default context window size
+- **Extend deny lists** — add URL, MCP, and skill patterns to the existing deny lists
+
+```json
+{
+  "model": "claude-sonnet-4",
+  "effortLevel": "high",
+  "contextTier": "long"
+}
+```
+
+Use the new `/settings --repo` and `/model --repo` flags (v1.0.70+) to view or edit repo-level settings from within an interactive CLI session:
+
+```
+/settings --repo    # view and edit .github/copilot/settings.json
+/model --repo       # pin or unpin the model for this repository
+```
+
+Similarly, `/settings --local` and `/model --local` target the local `.claude/settings.local.json` file, which is not committed.
+
+**When to use**: When a team wants to standardize the model or reasoning effort across all CLI sessions for a given repository — for example, enforcing a high-reasoning model on a security-critical codebase, or a faster model on a large frontend repo to keep iteration loops tight.
 
 ## Setting Up Team Configuration
 
@@ -586,6 +615,14 @@ Use `/diagnose` when a session is behaving unexpectedly — it inspects session 
 
 **Inline image rendering** (v1.0.64+): The CLI can display images inline in the terminal when your terminal supports it. If an MCP tool, agent, or attachment returns an image, it is rendered directly in the conversation timeline rather than shown as a file path or URL. This works in terminals with image protocol support (such as iTerm2, Kitty, Wezterm, and tmux with appropriate configuration).
 
+The `/refine` command *(v1.0.70+)* rewrites a rough, stream-of-consciousness prompt into a clear, well-structured one. Use it when you have an idea but want help expressing it precisely before sending:
+
+```
+/refine fix the thing where users cant log in sometimes when the token expires or whatever
+```
+
+Copilot will produce a polished rewrite that you can review and send (or edit further). This is useful when you know what you want but are struggling to articulate it clearly — especially for long or complex tasks where a precise prompt leads to better results.
+
 The `/ask` command lets you ask a quick question without affecting your conversation history. The current session context is preserved, so you can use it for one-off lookups without derailing an ongoing task. Responses are rendered as full markdown, including tables and formatted links:
 
 ```
@@ -658,7 +695,7 @@ Use `/autopilot` when you want to flip between supervised and unsupervised opera
 
 > **Enhanced autopilot (v1.0.64+)**: When autopilot mode is active — including when launched with `--autopilot` at startup or during automatic continuation turns — the agent automatically handles elicitation dialogs, `ask_user` prompts, sampling requests, and permission prompts without surfacing them as interactive dialogs. This means long-running automated sessions can proceed end-to-end without manual confirmation steps.
 
-> **Auto allow-all mode (v1.0.69+)**: In addition to the standard allow-all mode (which approves everything), the CLI now supports an **auto allow-all** mode that uses an LLM judge to evaluate each tool request. When enabled, the judge automatically approves requests it evaluates as acceptable, and asks you for manual confirmation only for requests it considers risky. This gives you a middle ground between full autopilot and fully supervised operation — most routine actions proceed automatically while unusual or potentially dangerous actions still surface for your review. Enable it from the session UI or with `/allow-all auto`.
+> **Auto allow-all mode (v1.0.69+)**: In addition to the standard allow-all mode (which approves everything), the CLI now supports an **auto allow-all** mode that uses an LLM judge to evaluate each tool request. When enabled, the judge automatically approves requests it evaluates as acceptable, and asks you for manual confirmation only for requests it considers risky. This gives you a middle ground between full autopilot and fully supervised operation — most routine actions proceed automatically while unusual or potentially dangerous actions still surface for your review. Enable it from the session UI or with `/allow-all auto`. **Note**: Auto allow-all mode requires experimental features to be enabled — run `/experimental on` or start the CLI with `--experimental` before using it (v1.0.69-3+).
 
 > **Read-only `gh` CLI commands (v1.0.46+)**: Read-only `gh` commands — such as `gh issue list`, `gh pr view`, `gh run status`, and other commands that don't write to GitHub — are **automatically approved** without a permission prompt. Only commands that write to GitHub (like creating issues, merging PRs) still require explicit approval. This reduces friction during exploratory sessions where you frequently check issue or PR status.
 
@@ -696,6 +733,16 @@ copilot --autopilot --max-autopilot-continues 10 "Refactor the authentication mo
 ```
 
 Set it higher for long-running tasks, or lower for tasks where you want more frequent checkpoints. Setting it to `0` disables automatic continuation entirely.
+
+The `--sandbox` and `--no-sandbox` flags *(v1.0.70+)* turn the OS-level shell sandbox on or off for the current session only, without changing your saved sandbox setting:
+
+```bash
+copilot --sandbox        # enable sandbox for this session (without persisting the change)
+copilot --no-sandbox     # disable sandbox for this session (without persisting the change)
+copilot --no-sandbox -p "Run the build and report failures"   # combine with prompt mode
+```
+
+This is useful with `-p` (prompt mode) when you need a one-off session that behaves differently from your saved sandbox preference — for example, running a trusted automation script that requires unrestricted shell access, without globally disabling the sandbox.
 
 The `--attachment` flag (available in prompt mode, `-p`) lets you attach files — images or native documents — to the initial prompt in non-interactive mode:
 
