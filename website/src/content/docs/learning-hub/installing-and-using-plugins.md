@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-24
+lastUpdated: 2026-07-09
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -178,6 +178,26 @@ Or from an interactive session:
 
 > **Deprecation notice**: Installing plugins directly from a GitHub repository URL, raw URL, or local file path (e.g., `copilot plugin install github/awesome-copilot`) is deprecated and will be removed in a future release. Use marketplace-based installation instead.
 
+### Pinning a Plugin to an Exact Commit *(v1.0.70+)*
+
+When security or reproducibility is important, you can pin a plugin to an exact commit SHA so it doesn't change when the upstream repo is updated. Use the `sha` field in the plugin source configuration:
+
+```bash
+copilot plugin install my-plugin@awesome-copilot --sha abc1234
+```
+
+Or by editing `~/.copilot/installed-plugins/_direct/my-plugin/source.json`:
+
+```json
+{
+  "name": "my-plugin",
+  "marketplace": "awesome-copilot",
+  "sha": "abc1234ef56789..."
+}
+```
+
+Pinning is especially useful for enterprise teams that need deterministic plugin behavior and want to review changes before updating.
+
 ### From VS Code
 
 Browse to the plugin via `@agentPlugins` in the Extensions search view or via **Chat: Plugins** in the Command Palette, then click **Install**.
@@ -199,6 +219,18 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### Using the /plugins Dashboard *(v1.0.69+)*
+
+From within an interactive Copilot CLI session, the `/plugins` command opens a full-screen dashboard for browsing and managing your installed plugins without leaving the session:
+
+```
+/plugins
+```
+
+The dashboard lets you view which plugins are installed, see what each one provides (agents, skills, hooks, MCP servers), enable or disable individual plugins, and access plugin details — all without running separate terminal commands. You can also reload plugin extensions without restarting your session (v1.0.69+).
+
+> **Tip**: `/plugin list` still works as a quick command-line listing, but `/plugins` gives you an interactive view that's easier to navigate when you have many plugins installed.
 
 ### Loading Plugins from a Local Directory
 
