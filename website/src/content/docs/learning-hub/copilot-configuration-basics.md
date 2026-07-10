@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-09
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -423,6 +423,36 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
 
+**GPT-5.6** (v1.0.70+): GPT-5.6 is now available as a selectable model in the CLI. You can choose it from the `/model` picker or by setting `"model": "gpt-5.6"` in your configuration.
+
+### Trusted Repository Settings (v1.0.70+)
+
+A trusted repository can lock in model and effort settings for everyone who works in it by committing a `.github/copilot/settings.json` file. When the CLI loads a session from that repository, it reads these settings and enforces them for the duration of the session:
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "long_context",
+  "denyLists": {
+    "urls": ["example-blocked-domain.com"],
+    "mcpServers": ["untrusted-server"],
+    "skills": ["risky-skill"]
+  }
+}
+```
+
+| Field | Effect |
+|-------|--------|
+| `model` | Pin the default model for all sessions in this repository |
+| `effortLevel` | Set the default reasoning effort level (`low`, `medium`, `high`) |
+| `contextTier` | Set the default context window tier (`default`, `long_context`) |
+| `denyLists.urls` | Extend the URL block list with repository-specific entries |
+| `denyLists.mcpServers` | Prevent specific MCP servers from being used in this repository |
+| `denyLists.skills` | Prevent specific skills from being invoked |
+
+> **Security note**: These settings are only applied when the repository is in the user's trusted repository list. They complement — but do not replace — organisation-level policies.
+
 ### CLI Session Commands
 
 The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file:
@@ -567,6 +597,14 @@ The `/chronicle skills review` subcommand *(v1.0.66+)* opens an interactive revi
 ```
 
 This keeps you in control of skill evolution — the agent can propose skill improvements as it discovers reusable patterns, but nothing is applied until you explicitly approve each change.
+
+The `/refine` command *(v1.0.70+)* rewrites a rough, stream-of-consciousness prompt into a clear, well-structured one — without executing it. Use it when you have a general idea but want Copilot to help you articulate it precisely before committing to an action:
+
+```
+/refine add auth to all the api routes and make sure things are checked and also do the tests
+```
+
+Copilot reformulates the prompt and presents the refined version for you to review and send. This is especially useful for complex or multi-step requests where vague wording might lead the agent in the wrong direction.
 
 > **Note**: Session history, file tracking, and the `/chronicle` command were previously experimental features. As of v1.0.40, they are available to all users without enabling experimental mode.
 
