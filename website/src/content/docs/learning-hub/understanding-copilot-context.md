@@ -3,7 +3,7 @@ title: 'Understanding Copilot Context'
 description: 'Learn how GitHub Copilot uses context from your code, workspace, and conversation to generate relevant suggestions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-07-11
 estimatedReadingTime: '8 minutes'
 tags:
   - context
@@ -56,6 +56,36 @@ In GitHub Copilot Chat, conversation context includes all previous messages, que
 Workspace context includes project-level information like your directory structure, configuration files (`.gitignore`, `package.json`, `tsconfig.json`), and overall repository organization. This helps Copilot understand your project type, dependencies, and conventions.
 
 **Example**: If your workspace contains a `package.json` with TypeScript and React dependencies, Copilot recognizes this is a TypeScript React project and generates suggestions using appropriate patterns and types.
+
+### Visual and Document Context (Copilot Vision)
+
+**Copilot Vision** is generally available in VS Code and adds a new category of context: images and documents. You can now attach screenshots, design mockups, diagrams, and PDF files directly in the chat panel to give Copilot visual context it couldn't previously access.
+
+**How to attach visuals**:
+- **Paste**: Copy an image to your clipboard, then paste it into the chat input
+- **Drag-and-drop**: Drag an image or PDF directly onto the chat input area
+- **Context menu**: Right-click an image file in the Explorer and choose "Add to Copilot Chat"
+
+Once attached, Copilot can analyze the visual content and use it to answer questions, generate code, or describe what it sees. Agents can also read attached images as part of their tool execution, making it possible to, for example, ask a custom agent to implement a UI from a design screenshot.
+
+**Common use cases**:
+- Share a UI mockup and ask Copilot to generate the corresponding component code
+- Paste an error screenshot and ask Copilot to diagnose the problem
+- Attach a database schema diagram and ask Copilot to write queries against it
+- Share a PDF spec document so Copilot can implement requirements directly from it
+
+**Example**:
+
+```
+You: [pastes screenshot of a login form design]
+"Generate a React component that matches this design.
+Use our existing Button and Input components from src/components/."
+
+Copilot: Based on the design, here's the LoginForm component:
+[provides code matching the visual layout]
+```
+
+> **Note**: Copilot Vision requires a Copilot Pro, Pro+, Business, or Enterprise plan. Image and PDF support may vary by model—multimodal-capable models handle visual content best.
 
 ## How Context Influences Suggestions
 

@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-01
+lastUpdated: 2026-07-11
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -181,6 +181,19 @@ This repository already includes a few useful examples of delegation-related syn
 - [`agents/rug-orchestrator.agent.md`](https://github.com/github/awesome-copilot/blob/main/agents/rug-orchestrator.agent.md) is a strong coordinator example. It enables the `agent` tool and restricts delegation with `agents: ['SWE', 'QA']`.
 - [`agents/gem-orchestrator.agent.md`](https://github.com/github/awesome-copilot/blob/main/agents/gem-orchestrator.agent.md) shows invocation control with `user-invocable` and `disable-model-invocation`, which is useful when deciding whether an orchestrator should be directly selectable, delegatable, or both.
 - [`agents/custom-agent-foundry.agent.md`](https://github.com/github/awesome-copilot/blob/main/agents/custom-agent-foundry.agent.md) documents the VS Code `handoffs` shape in its guidance section, which is helpful if you want a template before creating your own coordinator workflow.
+
+## Multi-chat agent sessions (VS Code)
+
+VS Code 1.128 introduced **multi-chat support for Claude agent-host sessions**, allowing you to run several concurrent agent chats within the same workspace. Each chat has its own context window and task focus, but they share the same workspace state, so file changes in one session are visible to the others.
+
+**Key capabilities**:
+- Open multiple agent chat panels and switch between them using keyboard shortcuts
+- Run independent research or implementation tasks in parallel without sharing context
+- Use **Quick Chats** in the Agents window to ask short questions without needing an open workspace—useful for lightweight queries or one-off lookups that don't warrant a full session
+
+**Read-only subagent chats (Preview)**: VS Code 1.128 also introduced a read-only mode for subagent chats. When a subagent is launched in read-only mode, it can browse and analyze code but cannot write files or execute commands. This is particularly useful for review-focused subagents (e.g., security review, architecture assessment) where you want analysis but no modifications to the working directory.
+
+To keep subagent work contained during development, you can also use **deep links to specific chats** (VS Code 1.128). These links let you share or bookmark a particular agent session, making it easy to return to an in-progress task or hand off context to a colleague.
 
 ## Important platform nuance: handoffs are not universal
 

@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-11
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -423,6 +423,8 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
 
+**GPT-5.6 support** (v1.0.70+): The CLI adds support for GPT-5.6, OpenAI's latest model. You can select it from the model picker or set it as your default model in `config.json`. Use the `gpt` alias to automatically resolve to the current best GPT model without pinning to a specific version.
+
 ### CLI Session Commands
 
 The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file:
@@ -719,6 +721,63 @@ copilot --config-dir ~/.my-copilot-config
 ```
 
 Set `COPILOT_HOME` in your shell profile to use a custom config directory across all sessions. This is especially useful when running multiple Copilot configurations for different projects or teams.
+
+## VS Code Agent-Host Configuration
+
+VS Code 1.128 introduced several advanced configuration options for **agent-host sessions** (Claude-powered multi-agent sessions in VS Code).
+
+### BYOK Models in Agent-Host Sessions (Experimental)
+
+You can now use your own API keys (BYOK — Bring Your Own Key) to supply models to VS Code agent-host Copilot sessions. Enable the experimental feature flag in your VS Code settings:
+
+```json
+{
+  "chat.agentHost.byokModels.enabled": true
+}
+```
+
+When enabled, models configured with your own API keys appear in the model picker alongside standard Copilot models, so you can mix BYOK and Copilot-provided models within agent-host orchestration. This is particularly useful for organizations with custom model agreements or access to model tiers not available through the standard Copilot subscription.
+
+You can also set a default utility model for BYOK sessions via:
+
+```json
+{
+  "chat.byokUtilityModelDefault": "your-preferred-model"
+}
+```
+
+The utility model is used for background tasks (like summarization or routing decisions) within agent-host sessions, keeping your primary BYOK model reserved for the main conversation.
+
+### Custom Endpoint Sampling Controls
+
+For BYOK or custom endpoint models, VS Code 1.128 adds `temperature` and `top_p` sampling control. These let you fine-tune model creativity and focus per-model without requiring a proxy layer:
+
+```json
+{
+  "github.copilot.chat.customEndpoints": [
+    {
+      "name": "my-custom-model",
+      "apiKey": "...",
+      "temperature": 0.2,
+      "top_p": 0.95
+    }
+  ]
+}
+```
+
+Lower `temperature` values produce more deterministic, focused code; higher values increase variety. Use `top_p` (nucleus sampling) to constrain the probability mass, which can reduce hallucination in structured outputs.
+
+## Enterprise Telemetry Configuration
+
+VS Code 1.128 adds **managed OpenTelemetry export** for Copilot usage telemetry. Administrators can configure an OpenTelemetry endpoint to capture Copilot interaction data for compliance, cost tracking, or audit purposes:
+
+```json
+{
+  "github.copilot.telemetry.openTelemetryEndpoint": "https://your-collector.example.com/v1/traces"
+}
+```
+
+This setting is typically applied via a managed device policy or VS Code settings sync, ensuring all users in an organization send telemetry to a consistent internal collector. Consult your GitHub enterprise administrator for the correct endpoint and any required authentication headers.
 
 ### Shell Completion
 
