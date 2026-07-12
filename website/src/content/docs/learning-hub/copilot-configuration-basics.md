@@ -3,11 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
-estimatedReadingTime: '10 minutes'
-tags:
-  - configuration
-  - setup
+lastUpdated: 2026-07-12
   - fundamentals
 relatedArticles:
   - ./what-are-agents-skills-instructions.md
@@ -413,6 +409,25 @@ In addition to the main config file, GitHub Copilot CLI reads two optional per-p
 
 These files follow the same format as `config.json` and are loaded after the global config, so they can tailor CLI behaviour—including hook definitions—per repository without touching `.github/`.
 
+### Repository-Level Model and Policy Settings (v1.0.70+)
+
+For team repositories, you can pin the model, effort level, and context tier, and extend the URL/MCP/skill deny lists by adding a `.github/copilot/settings.json` file to your repository:
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "long_context",
+  "denyList": {
+    "urls": ["https://internal-service.example.com"],
+    "mcpServers": ["untrusted-server"],
+    "skills": ["deprecated-skill"]
+  }
+}
+```
+
+This file is loaded only when the repository is trusted, so these settings apply to all team members working in the repository without requiring individual configuration. It complements per-user settings with repository-level defaults and guardrails.
+
 > **Important (v1.0.36+)**: Custom agents, skills, and commands placed in `~/.claude/` (the Claude Code user directory) are **no longer loaded** by GitHub Copilot CLI. Only `~/.claude/settings.json` is read for configuration. If you previously stored personal agents or skills in `~/.claude/`, move them to the supported locations: `~/.copilot/agents/` for user-level agents, `~/.copilot/skills/` or `~/.agents/skills/` for personal skills, or `.github/agents/` and `.github/skills/` in your repositories for project-level customizations.
 
 ### Model Picker
@@ -485,6 +500,14 @@ The `/undo` command reverts the last turn—including any file changes the agent
 ```
 
 Use `/undo` when the agent's last response went in an unwanted direction and you want to try a different approach from that point.
+
+The `/refine` command (v1.0.70+) rewrites a rough, stream-of-consciousness prompt into a clear, well-structured one. If you've typed out a long or rambling prompt and want to clean it up before sending, run `/refine` and the CLI will polish it into a more precise request:
+
+```
+/refine
+```
+
+Use `/refine` when you have the right idea but struggle to express it cleanly — it turns verbose or unclear prompts into focused, actionable instructions without losing the intent.
 
 The `/fork` command (v1.0.45+) copies the current session into a **new independent session** that starts from the same conversation state. The original session continues unchanged — you can switch back to it at any time. This is useful when you want to explore two different approaches to a problem simultaneously. In v1.0.64+, `/branch` is available as an alias for `/fork` (matching Claude Code's command naming):
 
