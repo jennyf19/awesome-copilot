@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-13
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -413,6 +413,27 @@ In addition to the main config file, GitHub Copilot CLI reads two optional per-p
 
 These files follow the same format as `config.json` and are loaded after the global config, so they can tailor CLI behaviour—including hook definitions—per repository without touching `.github/`.
 
+### Repository-Level Model and Policy Pinning (v1.0.70+)
+
+Trusted repositories can pin the **model**, **reasoning effort**, and **context tier** for everyone who opens that repository, and extend the URL, MCP, and skill deny lists — all via `.github/copilot/settings.json`:
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "long_context",
+  "deny": {
+    "urls": ["http://internal-only.example.com"],
+    "mcpServers": ["untrusted-server"],
+    "skills": ["experimental-skill"]
+  }
+}
+```
+
+When this file is present in a **trusted repository**, the CLI applies these settings automatically when any team member opens that repo — no manual configuration required. This is ideal for teams that want to enforce consistent model usage in a cost-sensitive project, require high-effort reasoning for security-critical work, or lock down external access for regulated environments.
+
+> **Trust is required**: Settings in `.github/copilot/settings.json` are only applied if the repository is trusted. Untrusted repositories cannot silently change your model or restrictions.
+
 > **Important (v1.0.36+)**: Custom agents, skills, and commands placed in `~/.claude/` (the Claude Code user directory) are **no longer loaded** by GitHub Copilot CLI. Only `~/.claude/settings.json` is read for configuration. If you previously stored personal agents or skills in `~/.claude/`, move them to the supported locations: `~/.copilot/agents/` for user-level agents, `~/.copilot/skills/` or `~/.agents/skills/` for personal skills, or `.github/agents/` and `.github/skills/` in your repositories for project-level customizations.
 
 ### Model Picker
@@ -543,6 +564,14 @@ The `/pr auto` command *(v1.0.66+)* starts a self-paced automation loop that dri
 ```
 
 `/pr auto` is ideal when you have a PR with failing tests or linting errors — let it work through failures one at a time while you focus on other things. `/pr automerge` extends this further: it continues until all CI checks pass, required reviews are approved, and the PR is successfully merged. Both commands can be monitored and stopped from `/loop` or `/every`, which register the running automation as a scheduleable loop task.
+
+The `/refine` command *(v1.0.70+)* rewrites a rough, stream-of-consciousness prompt into a clear, well-structured one — without changing its intent. Use it when you have an idea but aren't sure how to phrase it precisely:
+
+```
+/refine
+```
+
+Type or paste your rough prompt and `/refine` returns a cleaner version you can review, edit, and then send. This is particularly useful for complex agent tasks where a poorly-worded prompt leads to misinterpretation, or when onboarding teammates who are still learning how to write effective prompts.
 
 The `/share html` command exports the current session — including conversation history and any research reports — as a **self-contained interactive HTML file**:
 

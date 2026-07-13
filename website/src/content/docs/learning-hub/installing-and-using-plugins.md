@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-24
+lastUpdated: 2026-07-13
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -184,6 +184,18 @@ Browse to the plugin via `@agentPlugins` in the Extensions search view or via **
 
 ## Managing Plugins
 
+### The /plugins Dashboard (v1.0.69+)
+
+Inside an interactive Copilot session, the `/plugins` dashboard gives you a visual way to browse and manage all installed plugins without leaving the session:
+
+```
+/plugins
+```
+
+The dashboard lists all installed plugins with their status, included agents, and skills. You can enable, disable, update, or uninstall plugins directly from this view — useful when you want to quickly toggle a plugin without running CLI commands.
+
+### CLI Commands
+
 Once installed, plugins are managed with a few simple commands:
 
 ```bash
@@ -209,6 +221,23 @@ copilot --plugin-dir /path/to/my-plugin
 ```
 
 Plugins loaded this way appear in `/plugin list` under a separate **External Plugins** section, clearly distinguished from marketplace-installed plugins. This is useful for testing local plugins in development or loading private plugins that aren't published to any marketplace.
+
+### Pinning Plugins to an Exact Commit SHA (v1.0.70+)
+
+By default, installing a plugin from a marketplace tracks the latest version of that plugin. If you need to lock a plugin to a specific, immutable version for reproducibility or security auditing, you can pin it to an exact commit SHA using the `sha` field in your plugin source configuration:
+
+```json
+{
+  "plugins": [
+    {
+      "source": "my-org/my-plugin",
+      "sha": "a3f1c2d9b8e7f4a1c2d3e4f5a6b7c8d9e0f1a2b3"
+    }
+  ]
+}
+```
+
+When a `sha` is specified, the CLI fetches exactly that commit, ignoring any newer versions. This is recommended for production environments or CI pipelines where plugin behaviour must be deterministic across all machines.
 
 ### Where Plugins Are Stored
 
