@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-14
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -413,6 +413,32 @@ In addition to the main config file, GitHub Copilot CLI reads two optional per-p
 
 These files follow the same format as `config.json` and are loaded after the global config, so they can tailor CLI behaviour—including hook definitions—per repository without touching `.github/`.
 
+### Trusted Repository Settings (v1.0.70+)
+
+A trusted repository can pin CLI behavior using `.github/copilot/settings.json`. When the CLI trusts a repository (i.e., you have confirmed folder trust), it reads this file and applies the following overrides for sessions started in that repository:
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "long_context",
+  "denyURLs": ["https://internal-only.example.com"],
+  "denyMCPServers": ["untrusted-server"],
+  "denySkills": ["unapproved-skill"]
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `model` | Pin the model for all sessions in this repository |
+| `effortLevel` | Pin the reasoning effort level (`low`, `medium`, `high`) |
+| `contextTier` | Pin the context tier (`default` or `long_context`) |
+| `denyURLs` | Extend the URL deny list with additional blocked URLs |
+| `denyMCPServers` | Extend the MCP server deny list with additional blocked servers |
+| `denySkills` | Extend the skill deny list with additional blocked skills |
+
+This gives repository administrators fine-grained control over which model and capabilities are used in their codebase, without requiring each contributor to configure their personal settings.
+
 > **Important (v1.0.36+)**: Custom agents, skills, and commands placed in `~/.claude/` (the Claude Code user directory) are **no longer loaded** by GitHub Copilot CLI. Only `~/.claude/settings.json` is read for configuration. If you previously stored personal agents or skills in `~/.claude/`, move them to the supported locations: `~/.copilot/agents/` for user-level agents, `~/.copilot/skills/` or `~/.agents/skills/` for personal skills, or `.github/agents/` and `.github/skills/` in your repositories for project-level customizations.
 
 ### Model Picker
@@ -423,15 +449,21 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
 
+**GPT-5.6 support** (v1.0.70+): GPT-5.6 is now available as a model option in the CLI. Select it from the `/model` picker or set it as your default via `effortLevel` configuration.
+
+**`/model` scope flags** (v1.0.70+): The `/model` command now supports `--repo` and `--local` flags to save a model preference at the repository or local-override level rather than globally — useful when different projects benefit from different model choices.
+
 ### CLI Session Commands
 
 The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file:
 
 ```
 /settings
+/settings --repo    # edit repository-level settings (.claude/settings.json)
+/settings --local   # edit local per-project overrides (.claude/settings.local.json)
 ```
 
-The settings dialog supports search — type to filter settings by name. Changes take effect immediately.
+The settings dialog supports search — type to filter settings by name. Changes take effect immediately. Use `--repo` or `--local` (v1.0.70+) to target repository or local overrides rather than your user-level config.
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
 
@@ -577,6 +609,14 @@ The `/diagnose` command (v1.0.64+) analyzes the current session's logs and surfa
 ```
 
 Use `/diagnose` when a session is behaving unexpectedly — it inspects session logs and reports what it finds, making it easier to share diagnostics with support or understand what happened internally.
+
+The `/refine` command (v1.0.70+) rewrites a rough, stream-of-consciousness prompt into a clear, well-structured one. If you find yourself with a tangled or verbose request, run `/refine` to let the CLI clean it up before it's sent to the model:
+
+```
+/refine
+```
+
+This is useful when you have a complex idea in mind but aren't sure how to articulate it precisely — type your rough thoughts, then refine them into a cleaner prompt before submitting.
 
 **Keyboard shortcuts for queuing messages**: Use **Ctrl+Q** or **Ctrl+Enter** to queue a message (send it while the agent is still working). **Ctrl+D** no longer queues messages — it now has its default terminal behavior. If you have muscle memory for Ctrl+D queuing, switch to Ctrl+Q.
 

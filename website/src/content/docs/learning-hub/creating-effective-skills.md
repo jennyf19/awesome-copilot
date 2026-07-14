@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-30
+lastUpdated: 2026-07-14
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -412,6 +412,10 @@ A: In v1.0.66+, the agent can propose draft skill additions or improvements as i
 ```
 
 This opens a review flow where you can accept, reject, or defer each proposed change — giving you full control over how your skill library evolves. No changes are applied until you approve them.
+
+**Q: Can the CLI create draft skills automatically?**
+
+A: Yes. In v1.0.70+, when Copilot's Forge feature detects a clear, repeatable workflow pattern during your session — such as a sequence of steps you've performed multiple times — it proactively creates a draft skill capturing that pattern. The draft appears in `/chronicle skills review` for you to inspect and approve before anything is committed. This "skill from observation" flow helps you build up a skill library organically without having to write every skill from scratch.
 
 ## Common Pitfalls to Avoid
 
