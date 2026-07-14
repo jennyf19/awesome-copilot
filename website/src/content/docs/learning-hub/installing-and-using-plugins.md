@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-24
+lastUpdated: 2026-07-14
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -178,6 +178,24 @@ Or from an interactive session:
 
 > **Deprecation notice**: Installing plugins directly from a GitHub repository URL, raw URL, or local file path (e.g., `copilot plugin install github/awesome-copilot`) is deprecated and will be removed in a future release. Use marketplace-based installation instead.
 
+### Pinning a Plugin to a Specific Commit (v1.0.70+)
+
+For reproducible, auditable environments, you can pin a plugin to an exact commit SHA. This ensures your team always uses a known, reviewed version of the plugin regardless of updates to the source repository:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-org-plugins",
+      "source": "my-org/internal-plugins",
+      "sha": "a1b2c3d4e5f6..."
+    }
+  ]
+}
+```
+
+Use the `sha` field in the plugin source configuration. Pinned plugins will not update automatically — to update, change the `sha` to the new commit you want. This is especially useful in security-sensitive or regulated environments where you need to ensure that the plugin content you approved is exactly what runs.
+
 ### From VS Code
 
 Browse to the plugin via `@agentPlugins` in the Extensions search view or via **Chat: Plugins** in the Command Palette, then click **Install**.
@@ -199,6 +217,16 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### The /plugins Dashboard (v1.0.69+)
+
+From within an interactive session, use `/plugins` to open a dedicated management dashboard:
+
+```
+/plugins
+```
+
+The dashboard shows all installed plugins, their status, and available actions (enable, disable, update, remove) in a single interactive view. You can also reload plugin extensions from the dashboard without restarting your Copilot CLI session — useful after updating a plugin mid-session.
 
 ### Loading Plugins from a Local Directory
 
