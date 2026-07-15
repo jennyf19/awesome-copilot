@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-24
+lastUpdated: 2026-07-15
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -177,6 +177,24 @@ Or from an interactive session:
 ```
 
 > **Deprecation notice**: Installing plugins directly from a GitHub repository URL, raw URL, or local file path (e.g., `copilot plugin install github/awesome-copilot`) is deprecated and will be removed in a future release. Use marketplace-based installation instead.
+
+### Pinning a Plugin to an Exact Commit *(v1.0.70+)*
+
+For production or team environments where you need reproducibility, you can pin a plugin to an exact commit SHA using the `sha` field in the plugin's source configuration in `.github/copilot-settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-org-plugins",
+      "source": "my-org/internal-plugins",
+      "sha": "a1b2c3d4e5f6..."
+    }
+  ]
+}
+```
+
+Pinning to a SHA ensures the plugin does not change unexpectedly — useful when running in CI or when you want to audit exactly which version of a plugin is in use before allowing updates.
 
 ### From VS Code
 

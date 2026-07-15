@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-15
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -413,6 +413,22 @@ In addition to the main config file, GitHub Copilot CLI reads two optional per-p
 
 These files follow the same format as `config.json` and are loaded after the global config, so they can tailor CLI behaviour—including hook definitions—per repository without touching `.github/`.
 
+### Repository Trust Settings (`.github/copilot/settings.json`)
+
+*(v1.0.70+)* A trusted repository can pin the **model, effort level, and context tier** for all Copilot CLI sessions in that repository, and extend the URL/MCP/skill deny lists, using `.github/copilot/settings.json`:
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "denyUrls": ["*.internal.example.com"],
+  "denyMcpServers": ["untrusted-server"],
+  "denySkills": ["disallowed-skill"]
+}
+```
+
+This file is only respected after folder trust is confirmed — Copilot CLI will not apply these settings from an untrusted directory. Use it to enforce a consistent model or safety policy for all contributors to a repository without requiring individual configuration changes.
+
 > **Important (v1.0.36+)**: Custom agents, skills, and commands placed in `~/.claude/` (the Claude Code user directory) are **no longer loaded** by GitHub Copilot CLI. Only `~/.claude/settings.json` is read for configuration. If you previously stored personal agents or skills in `~/.claude/`, move them to the supported locations: `~/.copilot/agents/` for user-level agents, `~/.copilot/skills/` or `~/.agents/skills/` for personal skills, or `.github/agents/` and `.github/skills/` in your repositories for project-level customizations.
 
 ### Model Picker
@@ -422,6 +438,12 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+
+**GPT-5.6** *(v1.0.70+)* is now available as a selectable model in the model picker. Use the `/model` command or `--model` flag to select it:
+
+```
+/model gpt-5.6
+```
 
 ### CLI Session Commands
 
@@ -504,10 +526,11 @@ The `/cd` command changes the working directory for the current session. Since v
 
 This is useful when you have multiple backgrounded sessions each focused on a different project directory.
 
-The `/worktree` command (v1.0.61+, also aliased `/move`) creates a new git worktree and switches into it, moving any uncommitted changes along. This lets you start working on a parallel branch without leaving your current terminal session:
+The `/worktree` command (v1.0.61+) creates a new git worktree and switches into it, **leaving your uncommitted changes behind** in the current worktree. Use `/worktree` when you want to start a clean branch for a parallel task without stashing or carrying over in-progress changes. In v1.0.71+, the related `/move` command does the opposite — it carries your uncommitted changes **into** the new worktree, making it easy to continue the same work on a new branch:
 
 ```
-/worktree my-feature-branch
+/worktree my-feature-branch   # new worktree, uncommitted changes stay here
+/move     my-feature-branch   # new worktree, uncommitted changes follow you
 ```
 
 In v1.0.66+, you can pass a task description to `/worktree` to name the branch from the task and immediately run the task as the first prompt in the new worktree — all in one step:
@@ -577,6 +600,22 @@ The `/diagnose` command (v1.0.64+) analyzes the current session's logs and surfa
 ```
 
 Use `/diagnose` when a session is behaving unexpectedly — it inspects session logs and reports what it finds, making it easier to share diagnostics with support or understand what happened internally.
+
+The `/refine` command *(v1.0.70+)* rewrites a rough, stream-of-consciousness prompt into a clear, well-structured one before submitting it to the agent:
+
+```
+/refine
+```
+
+Run `/refine` when you have a vague idea you want to express better — it helps you articulate the task clearly without starting from scratch. The refined prompt is shown for review before being used.
+
+The `/voice devices` command *(v1.0.71+)* lets you choose and persist the microphone to use for voice mode:
+
+```
+/voice devices
+```
+
+Use this if voice input defaults to the wrong microphone, or if you want to switch input devices without leaving the session.
 
 **Keyboard shortcuts for queuing messages**: Use **Ctrl+Q** or **Ctrl+Enter** to queue a message (send it while the agent is still working). **Ctrl+D** no longer queues messages — it now has its default terminal behavior. If you have muscle memory for Ctrl+D queuing, switch to Ctrl+Q.
 
@@ -688,6 +727,17 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+> **Plan mode guardrails (v1.0.71+)**: Plan mode now hard-blocks any built-in tool call that would modify your workspace — the agent cannot edit files or run mutating shell commands while planning. Built-in mutators like opening a pull request are also blocked. MCP and external tools remain allowed. This makes plan mode a safe way to review what the agent intends to do before committing.
+
+The `--sandbox` / `--no-sandbox` flags *(v1.0.70+)* turn the OS-level shell sandbox on or off for the **current session only**, without changing your saved sandbox setting:
+
+```bash
+copilot --sandbox           # force sandbox on for this session
+copilot --no-sandbox        # force sandbox off for this session
+```
+
+This is useful with `-p` (prompt mode) when you want to override the default sandbox behavior for a specific scripted run. Your global `sandbox` setting is unchanged.
 
 The `--max-autopilot-continues` flag controls how many times Copilot can automatically continue in autopilot mode before pausing for confirmation. The default is 5:
 
