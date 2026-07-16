@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-24
+lastUpdated: 2026-07-16
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -178,6 +178,23 @@ Or from an interactive session:
 
 > **Deprecation notice**: Installing plugins directly from a GitHub repository URL, raw URL, or local file path (e.g., `copilot plugin install github/awesome-copilot`) is deprecated and will be removed in a future release. Use marketplace-based installation instead.
 
+### Pinning a Plugin to an Exact Commit
+
+To ensure a plugin installation is reproducible and doesn't change unexpectedly when the source repository is updated, you can pin the plugin to an exact commit SHA (v1.0.70+). Add a `sha` field to the plugin source configuration in your settings:
+
+```json
+{
+  "plugins": [
+    {
+      "source": "my-org/internal-plugins",
+      "sha": "a1b2c3d4e5f6..."
+    }
+  ]
+}
+```
+
+This is especially useful in team or CI environments where you need to lock plugin behavior to a known-good version.
+
 ### From VS Code
 
 Browse to the plugin via `@agentPlugins` in the Extensions search view or via **Chat: Plugins** in the Command Palette, then click **Install**.
@@ -195,6 +212,9 @@ copilot plugin update my-plugin
 
 # Refresh all marketplace catalogs (fetch the latest list of available plugins)
 copilot plugin marketplace update
+
+# Remove a marketplace registration (v1.0.71+)
+copilot plugin marketplace remove my-marketplace
 
 # Remove a plugin
 copilot plugin uninstall my-plugin
