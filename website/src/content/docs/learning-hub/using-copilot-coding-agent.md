@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-05-13
+lastUpdated: 2026-07-17
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -333,6 +333,20 @@ This repository provides a curated collection of agents, skills, and hooks desig
 4. The hooks will run automatically during coding agent sessions
 
 > **Example workflow**: Combine a `test-specialist` agent with a `database-migrations` skill and a linting hook. Assign an issue to the coding agent using the test-specialist agent — it will automatically pick up the migrations skill when relevant, and the hook ensures all code is formatted before completion.
+
+### Managing Worktrees: `/worktree` and `/move` (v1.0.71+)
+
+Copilot CLI provides two distinct commands for managing worktrees during a session, which now have separate responsibilities:
+
+- **`/worktree`** — Creates a new worktree and **leaves your uncommitted changes behind** in the current worktree. Use this when you want to start fresh on a new branch without losing work in progress.
+- **`/move`** — Creates a new worktree and **carries your uncommitted changes into it**. Use this when you realize you started work on the wrong branch and want to move it cleanly.
+
+```text
+/worktree     # creates a new isolated worktree; uncommitted changes stay here
+/move         # creates a new worktree and brings your current changes with you
+```
+
+This replaces the earlier behavior where `/worktree` handled both cases depending on the prompt.
 
 ## Remote Control
 
