@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-17
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -686,6 +686,8 @@ copilot --mode agent    # start in agent mode (autonomous tool use)
 copilot --autopilot     # alias for --mode autopilot (allow-all)
 copilot --plan          # start in plan mode (propose without executing)
 ```
+
+> **Plan mode safeguard (v1.0.71+)**: Plan mode now **hard-blocks built-in tool calls that would modify the workspace**. The agent cannot edit files or run mutating shell commands while planning — only read and search operations are permitted. This ensures that plan mode truly remains a safe proposal stage before any changes are made. Built-in mutators like opening a pull request are also blocked; MCP and external tools remain allowed.
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
 

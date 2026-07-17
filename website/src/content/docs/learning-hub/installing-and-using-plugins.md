@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-24
+lastUpdated: 2026-07-17
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -181,6 +181,20 @@ Or from an interactive session:
 ### From VS Code
 
 Browse to the plugin via `@agentPlugins` in the Extensions search view or via **Chat: Plugins** in the Command Palette, then click **Install**.
+
+### Granular flag-based management (v1.0.72+)
+
+You can now target specific components within a plugin using `--plugin`, `--mcp`, and `--skill` flags on `copilot plugins add` and `copilot plugins remove`. This is useful when you want to install or remove only part of a plugin's contents rather than the whole package:
+
+```bash
+# Remove just a skill from an installed plugin
+copilot plugins remove my-plugin --skill database-migrations
+
+# Add or reconfigure a specific MCP server from a plugin
+copilot plugins add my-plugin --mcp my-mcp-server
+```
+
+These flags give you fine-grained control without having to uninstall and reinstall the entire plugin.
 
 ## Managing Plugins
 
