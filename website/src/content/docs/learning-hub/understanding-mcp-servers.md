@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-18
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -353,6 +353,19 @@ A: There's no hard limit, but each server is a running process. Configure only t
 **Q: I'm using an Azure DevOps repository. Will the GitHub MCP server interfere?**
 
 A: No. Copilot CLI automatically detects Azure DevOps repositories and disables the built-in GitHub MCP server for those sessions. This prevents irrelevant GitHub API calls when your project is hosted on Azure DevOps. Other MCP servers you have configured are unaffected.
+
+**Q: Can I persist which GitHub MCP tools or toolsets are enabled?**
+
+A: Yes, as of v1.0.71. Use `settings.json` to persist your GitHub MCP toolset and tool preferences across sessions:
+
+```json
+{
+  "githubMcpToolsets": ["repos", "issues", "pull_requests"],
+  "githubMcpTools": ["get_issue", "create_pull_request"]
+}
+```
+
+The `githubMcpToolsets` field controls which logical groups of GitHub tools are enabled, while `githubMcpTools` selects individual tools. These settings are saved to your persistent Copilot configuration and apply to every session without needing to re-select them in the UI. You can also manage these via `/settings` in an interactive session.
 
 ## Next Steps
 
