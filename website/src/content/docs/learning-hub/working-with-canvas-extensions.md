@@ -3,7 +3,7 @@ title: 'Working with Canvas Extensions'
 description: 'Create and iterate on GitHub Copilot app canvases using /create-canvas, then shape them into reusable project or personal extensions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-17
+lastUpdated: 2026-07-18
 estimatedReadingTime: '8 minutes'
 tags:
   - copilot-app
@@ -110,6 +110,19 @@ Reference implementations:
 - SDK docs/source: [`joinSession`](https://github.com/github/copilot-sdk/blob/main/nodejs/docs/extensions.md), [`createCanvas`](https://github.com/github/copilot-sdk/blob/main/nodejs/src/canvas.ts)
 - Repo example: [`extensions/backlog-swipe-triage/extension.mjs`](https://github.com/github/awesome-copilot/blob/main/extensions/backlog-swipe-triage/extension.mjs)
 - Persistent user-scoped path example: [`extensions/chromium-control-canvas/extension.mjs`](https://github.com/github/awesome-copilot/blob/main/extensions/chromium-control-canvas/extension.mjs)
+
+## Canvas support in Copilot CLI (v1.0.71+)
+
+Starting with v1.0.71, canvas extensions are also supported in **GitHub Copilot CLI**, not just the Copilot app. This means extension-driven canvas interactions can now work in terminal-based sessions.
+
+When a canvas extension is installed (via a plugin or directly), it can render its interactive surface and communicate with the CLI agent in the same way it does in the app. The CLI will display the canvas in the appropriate panel or surface depending on the terminal environment.
+
+This is especially useful for:
+- Workflow automations that span both CLI and app sessions
+- Canvas extensions bundled in plugins that need to work across surfaces
+- Testing or iterating on extensions before deploying them to the app
+
+> **Note**: Canvas rendering in the CLI depends on the terminal's capabilities. For the richest interactive experience, the GitHub Copilot app remains the primary canvas surface.
 
 ## Examples from this repository
 
