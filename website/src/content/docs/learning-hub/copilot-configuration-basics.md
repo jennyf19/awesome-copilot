@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-19
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -278,6 +278,34 @@ When writing TypeScript code:
 
 **When to use**: For project-wide coding standards, architectural patterns, or technology-specific conventions that should influence all suggestions.
 
+### Trusted Repository Settings (v1.0.70+)
+
+A trusted repository can pin the model, reasoning effort level, and context tier for all users working in it, and extend the URL, MCP server, and skill deny lists. Create `.github/copilot/settings.json` in your repository:
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "long_context",
+  "denyUrls": ["*.internal.example.com"],
+  "denyMcpServers": ["untrusted-server"],
+  "denySkills": ["risky-skill"]
+}
+```
+
+These settings are applied when a user loads the repository in a trusted context. They can **pin** the model and effort so everyone on the team uses a consistent AI configuration, and they can **extend** deny lists to enforce security policies at the repository level.
+
+| Field | Description |
+|-------|-------------|
+| `model` | Pin a specific model for all sessions in this repository |
+| `effortLevel` | Set the reasoning effort (`low`, `medium`, `high`) |
+| `contextTier` | Set the context window tier (`default`, `long_context`) |
+| `denyUrls` | Additional URL patterns to block for this repository |
+| `denyMcpServers` | MCP server names to block |
+| `denySkills` | Skill names to block |
+
+> **Note**: This is distinct from `.claude/settings.json` and `.github/copilot-settings.json`. The `.github/copilot/settings.json` file is specifically for pinning AI model and effort configuration and extending security deny lists.
+
 ## Setting Up Team Configuration
 
 Follow these steps to establish effective team-wide Copilot configuration:
@@ -423,6 +451,8 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
 
+**Plan mode hard-blocks workspace mutations** (v1.0.71+): When the agent is in **plan mode**, built-in tool calls that would modify the workspace are now hard-blocked — the agent cannot edit files or run mutating shell commands while planning. This ensures plan mode is truly non-destructive. Built-in mutators like opening a pull request are also blocked in plan mode; MCP tools and external tools are still allowed.
+
 ### CLI Session Commands
 
 The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file:
@@ -504,10 +534,16 @@ The `/cd` command changes the working directory for the current session. Since v
 
 This is useful when you have multiple backgrounded sessions each focused on a different project directory.
 
-The `/worktree` command (v1.0.61+, also aliased `/move`) creates a new git worktree and switches into it, moving any uncommitted changes along. This lets you start working on a parallel branch without leaving your current terminal session:
+The `/worktree` command (v1.0.61+) creates a new git worktree on a new branch and switches into it. The `/move` command carries any uncommitted changes with you into the new worktree. In v1.0.71+, these are **separate commands** with distinct behavior:
+
+| Command | What it does |
+|---------|--------------|
+| `/worktree <branch>` | Creates a new worktree on a new branch, **leaving uncommitted changes behind** in the original worktree |
+| `/move <branch>` | Creates a new worktree and **carries your uncommitted changes** into it |
 
 ```
-/worktree my-feature-branch
+/worktree my-feature-branch   # start a clean slate on a new branch
+/move my-feature-branch       # take your work-in-progress to a new branch
 ```
 
 In v1.0.66+, you can pass a task description to `/worktree` to name the branch from the task and immediately run the task as the first prompt in the new worktree — all in one step:
@@ -518,7 +554,9 @@ In v1.0.66+, you can pass a task description to `/worktree` to name the branch f
 
 This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
 
-After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
+After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
+
+> **Migration note (v1.0.71+)**: Prior to v1.0.71, `/worktree` was aliased to `/move` and both moved uncommitted changes into the new worktree. After upgrading to v1.0.71+, `/worktree` leaves changes behind — use `/move` if you want to carry uncommitted changes.
 
 The `/every` command (also available as `/loop` since v1.0.64) schedules a recurring prompt to run automatically at a specified interval. The companion `/after` command runs a prompt once after a specified delay. Both are useful for self-paced automation — polling for results, periodically summarizing progress, or triggering other slash commands on a timer:
 
@@ -591,6 +629,14 @@ The `/ask` command lets you ask a quick question without affecting your conversa
 ```
 /ask What does the `retry` utility in src/utils do?
 ```
+
+The `/refine` command (v1.0.70+) rewrites a rough, stream-of-consciousness prompt into a clear and actionable one. Use it when you have a general idea of what you want but haven't articulated it precisely — `/refine` turns your rough draft into a well-formed prompt you can review before sending:
+
+```
+/refine fix the weird bug in auth where logged out users still see their profile briefly
+```
+
+The refined version is shown for your review before it's sent to the model, giving you a chance to tweak or accept it.
 
 The `/env` command shows all loaded environment details — instructions, MCP servers, skills, agents, and plugins — in a single view. Use it to verify that the right resources are active for the current session:
 

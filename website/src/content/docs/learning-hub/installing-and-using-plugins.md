@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-24
+lastUpdated: 2026-07-19
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -209,6 +209,23 @@ copilot --plugin-dir /path/to/my-plugin
 ```
 
 Plugins loaded this way appear in `/plugin list` under a separate **External Plugins** section, clearly distinguished from marketplace-installed plugins. This is useful for testing local plugins in development or loading private plugins that aren't published to any marketplace.
+
+### Pinning Plugins to a Specific Commit (v1.0.70+)
+
+For reproducibility and security, you can pin a marketplace plugin to an exact commit SHA. This ensures the plugin code never changes unexpectedly due to upstream updates:
+
+```json
+{
+  "plugins": [
+    {
+      "source": "awesome-copilot/database-data-management",
+      "sha": "a1b2c3d4e5f6..."
+    }
+  ]
+}
+```
+
+Pinning is especially useful in team or CI environments where you want consistent plugin behavior across all installs. To update to a newer commit, update the `sha` value explicitly — the plugin will not auto-update as long as a `sha` is pinned.
 
 ### Where Plugins Are Stored
 
