@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-24
+lastUpdated: 2026-07-20
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -178,6 +178,24 @@ Or from an interactive session:
 
 > **Deprecation notice**: Installing plugins directly from a GitHub repository URL, raw URL, or local file path (e.g., `copilot plugin install github/awesome-copilot`) is deprecated and will be removed in a future release. Use marketplace-based installation instead.
 
+### Pinning a Plugin to a Specific Commit (v1.0.70+)
+
+To lock a plugin to an exact, immutable version, add a `sha` field to its source configuration. This prevents unexpected changes when the plugin's branch is updated:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-stable-plugins",
+      "source": "my-org/internal-plugins",
+      "sha": "abc1234def5678..."
+    }
+  ]
+}
+```
+
+Pinning to a commit SHA is especially useful in production environments where you want to control exactly which version of a plugin is deployed.
+
 ### From VS Code
 
 Browse to the plugin via `@agentPlugins` in the Extensions search view or via **Chat: Plugins** in the Command Palette, then click **Install**.
@@ -199,6 +217,26 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### Installing Individual Skills (v1.0.72+)
+
+You can install a single skill without wrapping it in a full plugin using the `--skill` flag. This is useful when you only need one skill from a larger collection, or when you've written a skill locally and want to install it:
+
+```bash
+# Install a skill from a local directory
+copilot plugins install --skill ./my-skill/
+
+# Install a skill from a URL
+copilot plugins install --skill https://example.com/my-skill.zip
+
+# Install a skill from a file, scoped to the current repository
+copilot plugins install --skill ./my-skill/ --scope project
+```
+
+- Omit `--scope project` to install the skill at user scope (available across all your projects)
+- Use `--scope project` to install the skill into the current repository (`.github/skills/`)
+
+You can also manage skills via `/plugins install --skill` in an interactive session, and remove them with `copilot plugins remove --skill <skill-name>`.
 
 ### Loading Plugins from a Local Directory
 
