@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-25
+lastUpdated: 2026-07-21
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -369,6 +369,21 @@ Run ESLint after the agent finishes responding and block if there are errors:
 
 If the lint command exits with a non-zero status, the action is blocked.
 
+> **Safety limit**: An `agentStop` hook that always returns a non-zero exit code (always blocks) can no longer loop indefinitely. The CLI ends the turn after **8 consecutive blocks**, and passes a `stop_hook_active` flag to `agentStop` hooks so they can detect a forced continuation and self-limit their behavior. Use this flag in your hook script to avoid writing an infinite blocker:
+>
+> ```bash
+> #!/usr/bin/env bash
+> INPUT=$(cat)
+> STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false')
+>
+> if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
+>   # Already in forced continuation — don't block again
+>   exit 0
+> fi
+>
+> npx eslint . --max-warnings 0
+> ```
+
 ### Security Gating with preToolUse
 
 Block dangerous commands before they execute. Use the `matcher` field to target only the `bash` tool, so the hook doesn't fire for file edits or other tools:
@@ -391,6 +406,8 @@ Block dangerous commands before they execute. Use the `matcher` field to target 
 ```
 
 The `preToolUse` hook receives JSON input with details about the tool being called. Your script can inspect this input and exit with a non-zero code to **deny** the tool execution, or exit with zero to **approve** it.
+
+> **Exit code 2 — silent deny**: Exiting with code `2` denies the tool call without surfacing a hook error message to the agent. This is useful when you want the denial to be invisible (e.g., a policy block that shouldn't appear in the agent's output). Any other non-zero exit code produces a visible denial message.
 
 ### Modifying Tool Arguments with preToolUse
 
