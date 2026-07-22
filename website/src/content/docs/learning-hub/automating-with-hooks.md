@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-25
+lastUpdated: 2026-07-22
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -94,7 +94,7 @@ Hooks can trigger on several lifecycle events:
 | `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
 | `PermissionRequest` | When the CLI shows a **permission prompt** to the user | Programmatically approve or deny permission requests, enable auto-approval in CI/headless environments |
-| `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
+| `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes — receives `stop_hook_active` flag if blocking indefinitely (v1.0.72+) |
 | `preCompact` | Before the agent compacts its context window | Save a snapshot, log compaction event, run summary scripts |
 | `subagentStart` | A subagent is spawned by the main agent | Inject additional context into the subagent's prompt, log subagent launches |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
@@ -369,6 +369,27 @@ Run ESLint after the agent finishes responding and block if there are errors:
 
 If the lint command exits with a non-zero status, the action is blocked.
 
+#### Preventing infinite loops with `stop_hook_active` (v1.0.72+)
+
+If an `agentStop` hook always blocks, the CLI would previously loop indefinitely. Starting with v1.0.72, the CLI exits the turn after **8 consecutive blocks** from the same `agentStop` hook. To let your hook detect this forced continuation and self-limit, the hook receives a `stop_hook_active` flag in its JSON input:
+
+```bash
+#!/usr/bin/env bash
+# scripts/validate-and-stop.sh
+INPUT=$(cat)
+STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false')
+
+# If we're already in a forced continuation, let it through
+if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
+  exit 0
+fi
+
+# Run the validation — block if it fails
+npx eslint . --max-warnings 0
+```
+
+Use this pattern to write `agentStop` hooks that can recover gracefully when the agent is forced to continue despite repeated blocks.
+
 ### Security Gating with preToolUse
 
 Block dangerous commands before they execute. Use the `matcher` field to target only the `bash` tool, so the hook doesn't fire for file edits or other tools:
@@ -391,6 +412,8 @@ Block dangerous commands before they execute. Use the `matcher` field to target 
 ```
 
 The `preToolUse` hook receives JSON input with details about the tool being called. Your script can inspect this input and exit with a non-zero code to **deny** the tool execution, or exit with zero to **approve** it.
+
+> **Exit code 2 for silent denial (v1.0.70+)**: A `preToolUse` hook that exits with code `2` denies the tool call without showing an error to the user. This is useful for silently blocking tool calls that don't match your policy without surfacing a distracting error message. Exit with any other non-zero code to deny with a visible error.
 
 ### Modifying Tool Arguments with preToolUse
 
