@@ -3,7 +3,7 @@ title: 'Working with Canvas Extensions'
 description: 'Create and iterate on GitHub Copilot app canvases using /create-canvas, then shape them into reusable project or personal extensions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-17
+lastUpdated: 2026-07-22
 estimatedReadingTime: '8 minutes'
 tags:
   - copilot-app
@@ -18,7 +18,7 @@ prerequisites:
   - Basic familiarity with GitHub Copilot agent sessions
 ---
 
-Canvas extensions give you shared, interactive work surfaces inside the GitHub Copilot app. Instead of keeping all progress in chat, you can move work into a visible artifact (such as a board, document, checklist, or browser-oriented surface) that both people and agents can update.
+Canvas extensions give you shared, interactive work surfaces inside the GitHub Copilot app and — as of v1.0.71 — the **GitHub Copilot CLI**. Instead of keeping all progress in chat, you can move work into a visible artifact (such as a board, document, checklist, or browser-oriented surface) that both people and agents can update.
 
 This guide explains what canvases can do, how to create one with `/create-canvas`, and how to use patterns from this repository as reference implementations.
 
@@ -36,6 +36,12 @@ This makes canvases especially useful for workflows where visibility and steerin
 - Planning documents
 - Live browser-assisted workflows
 - Release coordination surfaces
+
+## Canvas support in Copilot CLI (v1.0.71+)
+
+Starting with v1.0.71, canvas extensions are also available in the **GitHub Copilot CLI**, not just the Copilot app. When a canvas extension is installed (via a plugin or directly), its extension-driven interactions are available directly from your terminal session. This means the same canvas extensions you build for the app can surface in CLI sessions, enabling consistent interactive surfaces across both environments.
+
+Canvas extensions in the CLI follow the same `joinSession`/`createCanvas` contract as in the app — extension logic defined in `extension.mjs` works in both environments without modification.
 
 ## Create a canvas with `/create-canvas`
 

@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-22
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -415,6 +415,23 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 > **Important (v1.0.36+)**: Custom agents, skills, and commands placed in `~/.claude/` (the Claude Code user directory) are **no longer loaded** by GitHub Copilot CLI. Only `~/.claude/settings.json` is read for configuration. If you previously stored personal agents or skills in `~/.claude/`, move them to the supported locations: `~/.copilot/agents/` for user-level agents, `~/.copilot/skills/` or `~/.agents/skills/` for personal skills, or `.github/agents/` and `.github/skills/` in your repositories for project-level customizations.
 
+#### Repository-level model and policy pinning via `.github/copilot/settings.json` (v1.0.70+)
+
+A trusted repository can pin the model, reasoning effort level, and context tier for all sessions started inside it, and also extend the URL/MCP/skill deny lists. Add a `.github/copilot/settings.json` file to the repository:
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "long",
+  "denyUrls": ["*.internal.example.com"],
+  "denyMcpServers": ["untrusted-server"],
+  "denySkills": ["dangerous-skill"]
+}
+```
+
+When a user works in a repository containing this file and the repository is trusted, the specified model and effort level are automatically applied for that session. Deny-list extensions are merged with the user's own settings. This enables organizations to enforce consistent model and safety settings without requiring each developer to configure them individually.
+
 ### Model Picker
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
@@ -422,6 +439,25 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+
+**Per-session model override** (v1.0.72+): Use `/model --session` (or `/model -s`) to change the model, reasoning effort, or context window for **just the current session**, without affecting your global settings. When the session ends, your global model preference is restored automatically:
+
+```
+/model --session                    # open the session-scoped model picker
+/model -s claude-sonnet-4.6         # set session model directly
+```
+
+This is useful for temporarily switching to a more powerful (or cheaper) model for a specific task without changing your default.
+
+**Plan-mode model** (v1.0.74+): Use `/model plan` (or `/model --plan`) to set a dedicated model for use while in plan mode. Pass a model ID to set it, `off` to clear it, or no argument to open the picker:
+
+```
+/model plan                         # open plan-mode model picker
+/model plan claude-opus-4           # use a powerful model during planning
+/model plan off                     # clear the plan-mode override
+```
+
+When you leave plan mode, the CLI automatically reverts to your session or global model.
 
 ### CLI Session Commands
 
@@ -584,6 +620,14 @@ Use `/diagnose` when a session is behaving unexpectedly — it inspects session 
 
 **Shell command history in normal mode** (v1.0.65+): The **↑/↓** arrow keys and **Ctrl+R** reverse search now include past shell commands (commands run with `!`) while you are in normal (non-shell) input mode. Previously you had to type `!` to enter shell mode before history worked. Now you can recall and re-run a shell command without switching modes first — useful for quickly repeating a build, test, or diagnostic command from earlier in the session.
 
+**Interactive shell shortcut** (v1.0.72+): Type **`$`** at the prompt to open an interactive shell in the current session directory. Enable it in settings first:
+
+```
+/settings shellShortcut on
+```
+
+Once enabled, pressing `$` at an empty prompt opens a shell without needing to type `!`. This is a convenient shortcut for quick one-off commands during a session. The shortcut even works while the agent is running.
+
 **Inline image rendering** (v1.0.64+): The CLI can display images inline in the terminal when your terminal supports it. If an MCP tool, agent, or attachment returns an image, it is rendered directly in the conversation timeline rather than shown as a file path or URL. This works in terminals with image protocol support (such as iTerm2, Kitty, Wezterm, and tmux with appropriate configuration).
 
 The `/ask` command lets you ask a quick question without affecting your conversation history. The current session context is preserved, so you can use it for one-off lookups without derailing an ongoing task. Responses are rendered as full markdown, including tables and formatted links:
@@ -591,6 +635,14 @@ The `/ask` command lets you ask a quick question without affecting your conversa
 ```
 /ask What does the `retry` utility in src/utils do?
 ```
+
+The `/refine` command (v1.0.70+) rewrites a rough, stream-of-consciousness prompt into a clear, well-structured one. Use it when you have an idea but aren't sure how to phrase it effectively:
+
+```
+/refine
+```
+
+After running `/refine`, the CLI rephrases your current prompt into a more precise version you can edit and send. This is useful for improving the quality of complex requests before they reach the model.
 
 The `/env` command shows all loaded environment details — instructions, MCP servers, skills, agents, and plugins — in a single view. Use it to verify that the right resources are active for the current session:
 
