@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-25
+lastUpdated: 2026-07-23
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -369,6 +369,27 @@ Run ESLint after the agent finishes responding and block if there are errors:
 
 If the lint command exits with a non-zero status, the action is blocked.
 
+#### Loop protection with `stop_hook_active` (v1.0.72+)
+
+If an `agentStop` hook always blocks (exits non-zero), the CLI would normally loop indefinitely. To prevent this, after **8 consecutive blocks** Copilot forcibly ends the turn and passes a `stop_hook_active: true` flag in the hook's JSON input on the next invocation. Hooks can inspect this flag to detect forced continuation and self-limit:
+
+```bash
+#!/usr/bin/env bash
+# scripts/lint-check.sh
+INPUT=$(cat)
+STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false')
+
+# Back off when forced-continue is active to avoid an infinite loop
+if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
+  echo "Skipping lint — forced continuation active" >&2
+  exit 0
+fi
+
+npx eslint . --max-warnings 0
+```
+
+> **Best practice**: Always check `stop_hook_active` in `agentStop` hooks that can return non-zero. This prevents runaway loops while still enforcing your checks during normal operation.
+
 ### Security Gating with preToolUse
 
 Block dangerous commands before they execute. Use the `matcher` field to target only the `bash` tool, so the hook doesn't fire for file edits or other tools:
@@ -390,7 +411,15 @@ Block dangerous commands before they execute. Use the `matcher` field to target 
 }
 ```
 
-The `preToolUse` hook receives JSON input with details about the tool being called. Your script can inspect this input and exit with a non-zero code to **deny** the tool execution, or exit with zero to **approve** it.
+The `preToolUse` hook receives JSON input with details about the tool being called. Your script can inspect this input and choose an exit code:
+
+| Exit Code | Meaning |
+|-----------|---------|
+| `0` | **Approve** — the tool call proceeds normally |
+| `2` | **Deny** — the tool call is blocked; the agent continues the turn and can try another approach |
+| any other non-zero | **Error** — the tool call is blocked and the error is surfaced |
+
+> **v1.0.70+**: Exit code `2` is the canonical way to deny a `preToolUse` hook without raising an error. Use exit code `2` when your policy check actively blocks the tool (e.g., a disallowed command), and reserve non-zero codes other than `2` for unexpected script failures.
 
 ### Modifying Tool Arguments with preToolUse
 
@@ -642,11 +671,12 @@ echo "Pre-commit checks passed ✅"
 ## Best Practices
 
 - **Keep hooks fast**: Hooks run synchronously, so slow hooks delay the agent. Set tight timeouts and optimize scripts.
-- **Use non-zero exit codes to block**: If a hook exits with a non-zero code, the triggering action is blocked. Use this for must-pass checks.
+- **Use non-zero exit codes to block**: If a hook exits with a non-zero code, the triggering action is blocked. Use exit code `2` for `preToolUse` denial, and other non-zero codes for unexpected errors.
 - **Bundle scripts in the hook folder**: Keep related scripts alongside the hooks.json for portability.
 - **Document setup requirements**: If hooks depend on tools being installed (Prettier, ESLint), document this in the README.
 - **Test locally first**: Run hook scripts manually before relying on them in agent sessions.
 - **Layer hooks, don't overload**: Use multiple hook entries for independent checks rather than one monolithic script.
+- **Hooks follow `/cd`** (v1.0.72+): Lifecycle and subagent hook commands run in the **current session directory** after you change directories with `/cd`. Scripts that rely on the working directory for tool discovery (e.g., `npx`, `python`) will automatically pick up the new directory without any extra configuration.
 
 ## Common Questions
 
