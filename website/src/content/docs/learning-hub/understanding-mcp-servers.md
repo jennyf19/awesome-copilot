@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-23
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -69,6 +69,8 @@ MCP servers are configured per-workspace. GitHub Copilot CLI discovers server de
 | `.github/mcp.json` | Repository `.github/` folder | Auto-loaded workspace config (v1.0.61+) |
 | `.vscode/mcp.json` | VS Code workspace | VS Code–compatible workspace config |
 | `devcontainer.json` | Dev container | Available when running inside a container |
+
+> **Open Plugin Spec v1** (v1.0.74+): Copilot CLI now supports **Open Plugin Spec v1** plugin manifests and `mcp.json` configuration files. If you have an `mcp.json` at the repository root or inside `.github/`, it is recognized and loaded as a standard workspace MCP configuration without any additional setup.
 
 > **Security**: Workspace MCP servers are loaded **only after folder trust is confirmed**. If you haven't explicitly trusted a folder, servers defined in its config files won't start — protecting you from malicious MCP server configurations in untrusted repositories.
 
@@ -304,6 +306,8 @@ For example, a PostgreSQL server that can't connect because `DATABASE_URL` is no
 You can also open the `/mcp` manager while the agent is working to toggle servers on or off mid-turn. Add, edit, delete, and re-auth actions wait until the turn finishes, but enabling or disabling a server takes effect immediately.
 
 **Toggling servers on and off** (v1.0.66+): From the `/mcp` list view, you can **enable or disable individual MCP servers** without editing your config file. Select a server in the list and toggle it — disabled servers won't start in future sessions and their tools won't be available to agents. This is useful for temporarily disabling a server that's causing slowdowns or errors without removing it from your configuration entirely.
+
+**Deleting a server stops its process** (v1.0.72+): When you delete an MCP server with `/mcp delete`, the CLI immediately **stops its running background process** in addition to removing it from your configuration. You no longer need to restart Copilot after removing a server — the change takes effect immediately.
 
 **Common causes and fixes**:
 
