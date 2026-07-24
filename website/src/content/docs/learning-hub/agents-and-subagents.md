@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-01
+lastUpdated: 2026-07-24
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -131,6 +131,7 @@ The important behavior is different from a single chat turn:
 - independent tasks can run in parallel
 - each subagent gets its own context window
 - subagents share the same filesystem, so overlapping writes should be avoided
+- **multi-turn subagents are always enabled** (v1.0.72+): you can send follow-up messages to a running subagent without waiting for it to finish — useful for providing mid-task corrections or clarifications
 
 That makes `/fleet` a practical way to launch subagents even if you are not authoring custom agent files yourself.
 

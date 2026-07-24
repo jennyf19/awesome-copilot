@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-24
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -100,6 +100,8 @@ For MCP server tools, reference them by server name (e.g., `postgres`, `docker`)
 ### Agent Instructions
 
 After the frontmatter, write Markdown instructions that define the agent's behavior. Structure these clearly:
+
+> **Relative links in instructions (v1.0.73+)**: Markdown links and image references in an agent's body are resolved **relative to the agent file's location**. This means you can reference supplementary documents, checklists, or templates stored alongside your agent file without using absolute paths. For example, if `api-architect.agent.md` and `openapi-style-guide.md` are both in `.github/agents/`, you can reference the style guide as `[OpenAPI Style Guide](./openapi-style-guide.md)` in the agent's instructions and Copilot will resolve it correctly.
 
 ````markdown
 ---
