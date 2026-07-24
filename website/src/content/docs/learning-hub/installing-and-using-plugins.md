@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-24
+lastUpdated: 2026-07-24
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -199,6 +199,52 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### Managing Individual Components with Flags
+
+In addition to managing whole plugins, you can enable, disable, or remove specific components (agents, MCP servers, or skills) using the `--plugin`, `--mcp`, and `--skill` flags with the `/plugins` command (v1.0.72):
+
+```
+/plugins enable --mcp my-mcp-server    # enable a specific MCP server
+/plugins disable --skill my-skill      # disable a specific skill without removing it
+/plugins remove --plugin my-agent      # remove a specific agent from a plugin
+```
+
+The same flags are available from the CLI:
+
+```bash
+copilot plugins enable --mcp my-mcp-server
+copilot plugins disable --skill my-skill
+```
+
+Use `/plugins help` for an overview of all available subcommands and flags.
+
+### Installing Skills Directly
+
+You can install individual skills (without a full plugin) directly from a file, URL, or directory using `copilot plugins install --skill` (v1.0.72):
+
+```bash
+# Install a skill from a local directory
+copilot plugins install --skill ./my-skill
+
+# Install a skill from a URL
+copilot plugins install --skill https://example.com/my-skill.zip
+
+# Install a skill into the current repository (project scope)
+copilot plugins install --skill ./my-skill --scope project
+```
+
+This is useful when you want to share a single skill across projects without packaging it as a full plugin. Project-scoped installs go into `.github/skills/` in the current repository.
+
+You can also remove individually-installed skills:
+
+```bash
+copilot plugins remove --skill my-skill
+```
+
+### Open Plugin Spec v1 Support
+
+GitHub Copilot CLI now supports **Open Plugin Spec (OPS) v1** plugin manifests (v1.0.74). If your plugin uses an OPS v1 `plugin.json` manifest alongside an `mcp.json` configuration file, the CLI automatically reads both formats — no migration needed. This means plugins authored for OPS v1-compatible tools work with Copilot CLI out of the box.
 
 ### Loading Plugins from a Local Directory
 

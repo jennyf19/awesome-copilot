@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-24
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -422,6 +422,27 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+
+**New models** (v1.0.74–v1.0.75): **Claude Opus 5** and **gemini-3.6-flash** are now available in the model picker. Claude Opus 5 is Anthropic's most capable model and is well-suited for complex reasoning and architectural tasks. gemini-3.6-flash is a fast, cost-effective Google model for high-throughput workflows.
+
+**Per-session model override — `/model --session`** (v1.0.72): Use `/model --session` (short: `/model -s`) to change the model, reasoning effort, or context window for just the current session without affecting your global settings. This is ideal for temporarily switching to a more powerful model for a complex task while keeping your default model for everyday use:
+
+```
+/model --session claude-opus-5   # use Opus 5 for this session only
+/model -s gemini-3.6-flash       # use Gemini Flash for this session only
+```
+
+When the session ends, the global model setting is restored automatically.
+
+**Plan-mode model selection — `/model plan`** (v1.0.74): Use `/model plan` (or `/model --plan`) to select a different model that is used only while in plan mode. This lets you optimize cost versus quality — for example, use a fast, inexpensive model for planning and a more capable model for execution:
+
+```
+/model plan                  # open the model picker for plan mode
+/model --plan claude-opus-5  # pin Opus 5 as the plan-mode model
+/model --plan off             # clear the plan-mode override (reverts to session model)
+```
+
+When you leave plan mode, the session model is restored automatically.
 
 ### CLI Session Commands
 
