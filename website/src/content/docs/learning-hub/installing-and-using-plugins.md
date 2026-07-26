@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-24
+lastUpdated: 2026-07-26
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -73,6 +73,8 @@ The `plugin.json` manifest declares what the plugin contains:
   ]
 }
 ```
+
+> **Open Plugin Spec v1 (v1.0.74+)**: Copilot CLI now supports **Open Plugin Spec v1** plugin manifests and `mcp.json` configuration — the same format used by Claude Code and other AI developer tools. If you have a plugin already published in Open Plugin Spec v1 format, it can be installed in Copilot CLI without any conversion. This makes it straightforward to create plugins that work across multiple AI tools.
 
 ## Why Use Plugins?
 
@@ -181,6 +183,27 @@ Or from an interactive session:
 ### From VS Code
 
 Browse to the plugin via `@agentPlugins` in the Extensions search view or via **Chat: Plugins** in the Command Palette, then click **Install**.
+
+### Installing Individual Skills from the CLI (v1.0.72+)
+
+In addition to full plugin installs, you can install individual skills directly from a file, URL, or directory without packaging them as a plugin:
+
+```bash
+# Install from a local directory
+copilot plugins install --skill ./my-skill/
+
+# Install from a URL
+copilot plugins install --skill https://example.com/my-skill.zip
+
+# Install into the current repository (project scope)
+copilot plugins install --skill ./my-skill/ --scope project
+```
+
+This is useful when you want to share a single skill across projects without the overhead of a full plugin. Skills installed this way appear in `/plugin list` and can be managed with the usual `remove`/`disable` commands:
+
+```bash
+copilot plugins remove --skill my-skill
+```
 
 ## Managing Plugins
 
