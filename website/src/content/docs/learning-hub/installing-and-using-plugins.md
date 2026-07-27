@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-07-27
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -31,7 +31,7 @@ A plugin bundles one or more of the following components:
 | **Custom Agents** | Specialized AI assistants with tailored expertise | `agents/*.agent.md` |
 | **Skills** | Discrete callable capabilities with bundled resources | `skills/*/SKILL.md` |
 | **Hooks** | Event handlers that intercept agent behavior | `hooks.json` or `hooks/` |
-| **MCP Servers** | Model Context Protocol integrations for external tools | `.mcp.json` or `.github/mcp.json` |
+| **MCP Servers** | Model Context Protocol integrations for external tools | `.mcp.json`, `.github/mcp.json`, or `mcp.json` |
 | **LSP Servers** | Language Server Protocol integrations | `lsp.json` or `.github/lsp.json` |
 | **Extensions** | IDE extensions installable via the plugin marketplace (v1.0.62+) | `extensions/` |
 
@@ -73,6 +73,8 @@ The `plugin.json` manifest declares what the plugin contains:
   ]
 }
 ```
+
+> **Open Plugin Spec v1 (v1.0.74+)**: GitHub Copilot CLI now supports the [Open Plugin Spec v1](https://openpluginsspec.org/) standard for plugin manifests and `mcp.json` configuration files. This means plugins authored for other AI tools using the Open Plugin Spec format are directly installable in Copilot CLI without any conversion. The CLI detects and loads both the Copilot-native `plugin.json` format and the Open Plugin Spec manifest automatically.
 
 ## Why Use Plugins?
 
@@ -221,6 +223,31 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### Managing Plugins, MCP Servers, and Skills from an Interactive Session (v1.0.74+)
+
+Inside an interactive Copilot session, the `/plugins` command (also available as `/plugin`) now provides unified management for plugins, MCP servers, and skills — without needing separate `/mcp` or `/skill` commands:
+
+```
+/plugins help                         # show all available subcommands
+/plugins install my-plugin@awesome-copilot   # install a plugin
+/plugins update my-plugin             # update a plugin
+/plugins uninstall my-plugin          # remove a plugin
+/plugins enable --plugin my-plugin    # enable a plugin
+/plugins disable --plugin my-plugin   # disable a plugin
+
+# Manage MCP servers directly via /plugins
+/plugins enable --mcp my-mcp-server
+/plugins disable --mcp my-mcp-server
+/plugins remove --mcp my-mcp-server
+
+# Install an individual skill (without a full plugin)
+/plugins install --skill ./path/to/skill/
+/plugins install --skill https://example.com/skill.zip
+/plugins install --skill my-skill@awesome-copilot --scope project
+```
+
+The `--scope project` flag installs the skill or plugin into the current repository's `.github/` directory rather than your global user profile.
 
 ### Loading Plugins from a Local Directory
 
