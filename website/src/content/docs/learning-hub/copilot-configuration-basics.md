@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-07-31
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -447,9 +447,31 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
-**Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+**Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), `gpt`, `gemini` (Google/OpenAI), and `grok` (xAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
 
-### CLI Session Commands
+**Recently added models**: Claude Opus 5 was added in v1.0.75 and grok-4.5 in v1.0.76. Shell completion for `--model` (v1.0.78+) suggests `auto` and all supported model names as you type.
+
+**Shell completion for `--model`** (v1.0.78+): Tab-completing the `--model` flag on the command line now suggests `auto` and all currently supported model names, so you don't need to remember exact identifiers:
+
+```bash
+copilot --model <TAB>   # lists auto, claude-sonnet-4.6, grok-4.5, ...
+```
+
+### Authentication and Login
+
+`copilot login` authenticates the CLI with your GitHub account. As of v1.0.77, the default login flow on **local interactive terminals** is a browser-based OAuth flow — a browser window opens automatically so you can authorize without entering a device code. On **remote or headless terminals** (SSH, CI), the device-code flow remains the default.
+
+Use flags to explicitly control which flow is used:
+
+```bash
+copilot login               # browser-based OAuth on interactive terminals (default)
+copilot login --web-flow    # force browser-based OAuth
+copilot login --device-code # force device code (classic flow)
+```
+
+You can also switch flows interactively from the `/login` command inside a session.
+
+> **Note**: The interactive `/login` command lets you pick your preferred flow without leaving the session.
 
 The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file:
 

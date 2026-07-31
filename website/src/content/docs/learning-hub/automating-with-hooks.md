@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-07-31
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -513,6 +513,10 @@ exit 0
 > **How it works**: When the hook exits with code `0` **and** writes a valid `{"response": "..."}` JSON object to stdout, the CLI delivers that text to the user and stops processing — no model call is made. If the hook exits with code `0` but writes nothing (or writes no `response` key), the CLI proceeds normally and calls the LLM.
 
 > **Multiple hooks**: If several `userPromptSubmitted` hooks are configured, the first one that returns a `response` wins; subsequent hooks for that event are skipped.
+
+> **Validation (v1.0.76+)**: The CLI validates hook output more strictly. Non-string values for `modifiedPrompt`, `modifiedTransformedPrompt`, or `responseContent` are ignored with a warning instead of corrupting the session. A `null` `additionalContext` is treated as absent rather than being injected as the literal text `null`. A hook that sets `handled: true` without a usable `responseContent` is diagnosed with an error instead of silently falling through to the model.
+
+> **Output size limit (v1.0.76+)**: Hook output is bounded at **10 MiB per invocation**. An HTTP or command hook returning an unbounded response (e.g., a misconfigured webhook endpoint returning a full HTML page) will be truncated rather than exhausting memory or leaving an oversized session. Keep hook scripts focused and return only the JSON fields the CLI needs.
 
 ### Notification on Session End
 
