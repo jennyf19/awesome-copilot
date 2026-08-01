@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-01
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -143,6 +143,27 @@ EOF
 ### Extension Hooks Merging
 
 When multiple IDE extensions (or a mix of extensions and a `hooks.json` file) each define hooks, all hook definitions are **merged** rather than the last one overwriting the others. This means you can layer hooks from different sources—a project's `.github/hooks/` file, an extension you have installed, and a personal settings file—and all of them will fire for the relevant events.
+
+### sessionEnd behavior with stdin-piped and prompt-mode runs
+
+*(v1.0.78+)* When you run the CLI non-interactively by piping a prompt over stdin (e.g., `echo "summarize the repo" | copilot`) or using the `-p` flag, `sessionEnd` hooks now fire **once per completed agent turn** with `reason: complete` (or `reason: error` if the turn failed). If the run exits before completing a turn, no `sessionEnd` hook fires.
+
+This aligns with the behavior of `-p` (prompt mode) and is important for CI pipelines that rely on `sessionEnd` for cleanup, reporting, or notifications — the hook fires exactly when work is done, not on CLI shutdown.
+
+```json
+{
+  "hooks": {
+    "sessionEnd": [
+      {
+        "command": "./scripts/ci-cleanup.sh",
+        "description": "Clean up temporary files and post a status notification"
+      }
+    ]
+  }
+}
+```
+
+> **Upgrade note**: If you previously observed `sessionEnd` firing with `reason: user_exit` for piped runs and wrote logic that depended on that reason value, update your scripts to handle `reason: complete` instead.
 
 ### Cross-Platform Event Name Compatibility
 
