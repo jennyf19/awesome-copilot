@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-02
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -428,7 +428,8 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
-| `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode. As of v1.0.76, this is **on by default** — set to `false` to return to interactive mode after each task. (v1.0.69+) |
+| `allowDevToolCaches` | Grant sandboxed builds access to toolchain caches, registries, and installs so builds work without extra setup. On by default; set `false` to opt out. (v1.0.78+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -448,6 +449,8 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+
+**Supported models**: The model picker includes the latest Anthropic Claude, OpenAI GPT, Google Gemini, and xAI models. As of v1.0.76, **grok-4.5** (xAI) is now supported alongside the existing model families. Use `/model` or the `--model` flag to switch, or set a default via the `model` setting in your config file.
 
 ### CLI Session Commands
 
@@ -506,6 +509,8 @@ The `/session delete` command removes sessions you no longer need:
 You can also press **x** on a highlighted session in the session picker (`--resume`) to delete it directly from the list.
 
 In the session picker, press **`s`** to cycle the sort order: relevance, last used, created, or name. The picker also shows the branch name and idle/in-use status for each session.
+
+**Sessions sidebar** *(v1.0.76+, experimental)*: A new sidebar lets you manage multiple concurrent sessions without leaving your active session. Enable it with `/experimental on` to access a split-view panel that shows all running sessions, lets you switch between them, spawn new ones, and check their status at a glance. This is especially useful when directing several agents in parallel — you can monitor what each is doing and switch focus without opening a new terminal window.
 
 The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
 
@@ -647,11 +652,35 @@ The `/refine` command *(v1.0.70+)* rewrites a rough, stream-of-consciousness pro
 
 Type your rough idea, and `/refine` transforms it into a precise, well-structured prompt. This is especially helpful for complex multi-step tasks where prompt clarity significantly affects output quality — for example, turning "um make the login thing work better with the existing setup" into a focused task description with clear scope and acceptance criteria.
 
+The `/permissions` command *(v1.0.78+)* opens an interactive dialog to switch between approval modes for the current session. This gives you a single place to move between interactive, auto (LLM-judged), and allow-all modes without memorizing individual commands:
+
+```
+/permissions
+```
+
+Use `/permissions` when you want to review and change the approval policy mid-session — for example, switching from interactive to auto-approval once you trust the agent's direction on a long task.
+
+The `/limits predict` command *(v1.0.76+)* analyzes your recent session history and suggests an appropriate AI-credit limit for the current type of task:
+
+```
+/limits predict
+```
+
+This helps you set a `sessionLimits` value that fits your typical usage without over-restricting the agent on complex tasks.
+
 The `/env` command shows all loaded environment details — instructions, MCP servers, skills, agents, and plugins — in a single view. Use it to verify that the right resources are active for the current session:
 
 ```
 /env
 ```
+
+The `/plugins` command lets you inspect and manage the resources loaded in the current session. As of v1.0.76, it includes **enable/disable controls** for each resource type — plugins, instructions, agents, LSP servers, and hooks — so you can temporarily turn individual items on or off without editing config files or restarting the session:
+
+```
+/plugins
+```
+
+Use `/plugins` when you want to troubleshoot which resources are active, or when you need to disable a specific instruction or hook for a particular task without permanently removing it.
 
 The `/context` command shows a visualization of the current conversation's context window usage — how many tokens are consumed and how much headroom remains:
 
@@ -760,6 +789,18 @@ copilot --no-sandbox -p "Set up development environment with system tools"
 ```
 
 These flags apply only to the current invocation — your persisted sandbox preference remains unchanged.
+
+> **Enterprise managed sandbox floor (v1.0.76+)**: Enterprise administrators can enforce a restrictive sandbox floor using macOS or Windows native MDM (managed device) settings. When a managed policy is active, it **tightens but never loosens** the user's sandbox settings — users can make their sandbox more restrictive but cannot go below the org-configured minimum. The `/sandbox` dialog surfaces locked fields and managed filesystem paths so you can see exactly what is enforced. This ensures compliance without requiring per-user configuration.
+
+The `--web-flow` and `--device-code` login flags *(v1.0.77+)* control how `copilot login` authenticates. Browser-based OAuth is now the **default for local interactive terminals**, while device code remains the default for remote/headless environments:
+
+```bash
+copilot login                # web OAuth on local terminals (new default)
+copilot login --web-flow     # force browser-based OAuth
+copilot login --device-code  # force device code flow (for headless environments)
+```
+
+You can also run `/login` as a slash command inside an active session to pick a login method interactively. The web flow opens a browser window for authentication and completes without you needing to copy a device code.
 
 The `--attachment` flag (available in prompt mode, `-p`) lets you attach files — images or native documents — to the initial prompt in non-interactive mode:
 
