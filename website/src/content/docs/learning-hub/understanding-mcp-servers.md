@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-03
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -158,6 +158,15 @@ These are especially useful for plugins and installer scripts that need to self-
 | `session.mcp.resources.listTemplates` | List resource templates exposed by a connected MCP server (paginated) |
 
 Pagination support means these RPCs work reliably even when a server exposes a large number of resources. This is particularly useful for MCP servers that expose dynamic resource collections (such as database schemas or file trees) that need to be enumerated programmatically by agents or scripts.
+
+### Open Plugin Spec v1 and `mcp.json`
+
+*(v1.0.74+)* GitHub Copilot CLI supports **Open Plugin Spec v1** plugin manifests and recognises a `mcp.json` file at the plugin or project root as an additional MCP server configuration source. This means:
+
+- Plugins authored for other AI tools (that ship an `mcp.json`) are automatically picked up by Copilot CLI without requiring a separate `.mcp.json`.
+- The loading order is: `.mcp.json` → `.github/mcp.json` → `.vscode/mcp.json` → `mcp.json` (plugin root), with later files merging into the earlier config.
+
+This interoperability makes it easier to share MCP server configurations across different AI assistants in the same repository.
 
 ### Common MCP Server Configurations
 

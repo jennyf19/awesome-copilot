@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-03
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -429,6 +429,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `loginFlow` | Default login flow for `copilot login` on local interactive terminals: `web` (browser-based OAuth, default as of v1.0.77) or `device-code`. Use `--web-flow` or `--device-code` flags to override per-invocation. |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -469,6 +470,16 @@ The settings dialog supports search — type to filter settings by name. Changes
 ```
 
 These flags mirror the **Repo** and **Repo (local)** scope tabs available in the `/settings` dashboard (v1.0.71+), making it easier to manage per-repository vs. user-global configuration without ambiguity. In v1.0.71+, the `/settings` dashboard also shows **Repo** and **Repo (local)** tabs alongside the existing user-level view, giving you a unified place to see which settings are applied at each layer.
+
+**Picking a model for plan mode** *(v1.0.74+)*: Use `/model plan` (or `/model --plan`) to set a dedicated model that is used only while the CLI is in plan mode:
+
+```
+/model plan                 # open the model picker for plan mode
+/model plan claude-opus-5   # pin a specific model for plan mode
+/model plan off             # clear the plan-mode model (revert to session model)
+```
+
+This is useful when you want a high-reasoning model for planning (such as `claude-opus-5`) while using a faster model for implementation. The plan-mode model reverts to the session model when you leave plan mode.
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
 
@@ -663,6 +674,12 @@ The `/usage` command displays session metrics such as the number of tokens consu
 
 ```
 /usage
+```
+
+The `/limits predict` command *(v1.0.76+)* suggests an appropriate AI-credit session limit based on your recent session history. Run it to get a data-driven recommendation before setting a `sessionLimits` value:
+
+```
+/limits predict
 ```
 
 The `/compact` command summarizes the conversation history to free up context window space while preserving the thread of the conversation. Use it when your context is getting full but you do not want to start a fresh session:
