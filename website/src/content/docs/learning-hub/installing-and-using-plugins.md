@@ -3,10 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
-estimatedReadingTime: '8 minutes'
-tags:
-  - plugins
+lastUpdated: 2026-08-04
   - copilot-cli
   - fundamentals
 relatedArticles:
@@ -221,6 +218,20 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### Automatic Updates for First-Party Plugins
+
+*(v1.0.78+)* First-party plugins (those installed from the official `copilot-plugins` marketplace) are **automatically updated to the latest version at session start** — no manual `copilot plugin update` step needed. Community plugins from `awesome-copilot` and other third-party marketplaces still follow the standard manual update workflow to give you control over when you pick up changes.
+
+### Enabling and Disabling Plugin Components
+
+*(v1.0.76+)* The `/plugins` command now includes **granular enable/disable controls** for individual plugin components. Open the plugin manager and select any installed plugin to toggle its agents, skills, hooks, LSP servers, and instructions on or off independently:
+
+```
+/plugins
+```
+
+This is useful when a plugin includes components you don't need for a particular project, or when you want to disable a hook temporarily without uninstalling the whole plugin. Disabled components are preserved — they don't run but remain available to re-enable later.
 
 ### Loading Plugins from a Local Directory
 
