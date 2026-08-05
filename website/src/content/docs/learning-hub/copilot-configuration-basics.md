@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-05
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -429,6 +429,8 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `showToolDurations` | Show elapsed time for tool calls in the timeline header; ticks live while a call runs (for calls of at least 5 seconds). On by default — set to `false` to disable (v1.0.78+) |
+| `allowDevToolAccess` | Grant sandboxed builds access to toolchain caches, registries, and installs so builds work without extra sandbox setup. On by default — set to `false` to opt out. Renamed from `allowDevToolCaches` in v1.0.79 (v1.0.78+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -514,6 +516,8 @@ The `/rewind` command opens a timeline picker that lets you roll back the conver
 ```
 
 Use `/rewind` when you want to branch off from a different point in the conversation, rather than just undoing the most recent turn.
+
+*(v1.0.78+)* `/rewind` no longer requires git to be available. It now restores only the files that Copilot itself changed during the session (skipping files whose contents no longer match what Copilot last wrote), and presents a choice between reverting the **conversation only** or reverting both the **conversation and files**. This makes `/rewind` safe to use in repositories without git history or in partially-modified workspaces.
 
 The `/undo` command reverts the last turn—including any file changes the agent made—letting you course-correct without manually undoing edits:
 
@@ -627,6 +631,8 @@ Use `/diagnose` when a session is behaving unexpectedly — it inspects session 
 
 **Keyboard shortcuts for queuing messages**: Use **Ctrl+Q** or **Ctrl+Enter** to queue a message (send it while the agent is still working). **Ctrl+D** no longer queues messages — it now has its default terminal behavior. If you have muscle memory for Ctrl+D queuing, switch to Ctrl+Q.
 
+**Ctrl+G for freeform prompts** *(v1.0.77+)*: When the agent presents an `ask_user` freeform answer prompt, press **Ctrl+G** to open your configured editor (e.g., vim or VS Code) to write the answer without closing the prompt. This is useful for multi-line answers or when you prefer to compose a response in a full editor.
+
 **Background running tasks**: Press **Ctrl+X → B** to move the current running task or shell command to the background. The task continues executing while you can type a new message or review earlier output. This is useful for long-running commands where you want to interact with the agent while waiting for the result.
 
 **Shell command history in normal mode** (v1.0.65+): The **↑/↓** arrow keys and **Ctrl+R** reverse search now include past shell commands (commands run with `!`) while you are in normal (non-shell) input mode. Previously you had to type `!` to enter shell mode before history worked. Now you can recall and re-run a shell command without switching modes first — useful for quickly repeating a build, test, or diagnostic command from earlier in the session.
@@ -703,6 +709,14 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
 
+The `/permissions` command *(v1.0.78+)* is a dedicated command for switching between tool approval modes in the current session:
+
+```
+/permissions
+```
+
+Opening `/permissions` displays the available approval modes and lets you choose between them interactively. This is the recommended way to change the approval level mid-session, complementing `/allow-all` and `/autopilot` for coarser-grained control.
+
 The `/autopilot` command (v1.0.45+) is a quick in-session toggle that switches between **interactive mode** (where the agent pauses to ask for confirmation before tool use) and **autopilot mode** (where it runs autonomously). Unlike `/allow-all` which specifically controls whether tool permissions are required, `/autopilot` toggles the overall agent mode:
 
 ```
@@ -726,6 +740,8 @@ gh copilot --effort high "Refactor the authentication module"
 Accepted values are `low`, `medium`, and `high`. You can also set a default via the `effortLevel` config setting.
 
 ### CLI Startup Flags
+
+*(v1.0.77+)* **Browser-based login**: `copilot login` now defaults to the **browser (web) OAuth flow** for local interactive terminals. A browser window opens for you to authenticate, then closes and returns you to the CLI. The device code flow (the previous default) is still used for remote or headless environments. You can explicitly choose a flow with `--web-flow` or `--device-code`, or pick one interactively via the `/login` command.
 
 The `-C <directory>` flag changes the working directory before starting, similar to `git -C` (v1.0.42+). This is useful for scripts or aliases that need to start Copilot CLI in a specific project directory without a separate `cd`:
 
