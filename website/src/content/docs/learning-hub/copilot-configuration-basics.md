@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-07
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -507,6 +507,8 @@ You can also press **x** on a highlighted session in the session picker (`--resu
 
 In the session picker, press **`s`** to cycle the sort order: relevance, last used, created, or name. The picker also shows the branch name and idle/in-use status for each session.
 
+In v1.0.79+, the **Sessions tab/sidebar** supports **multiple concurrent sessions** — you can view and switch between all active sessions from within the sidebar without using the `--resume` picker. This makes it easier to manage parallel work across many sessions at a glance.
+
 The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
 
 ```
@@ -554,6 +556,12 @@ In v1.0.66+, you can pass a task description to `/worktree` to name the branch f
 ```
 
 This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
+
+In v1.0.79+, `/worktree new` starts a fresh session in a new worktree without requiring you to name the branch upfront — useful when you want to begin parallel work and let Copilot name the branch from context:
+
+```
+/worktree new
+```
 
 After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
 
@@ -740,6 +748,12 @@ The `--mode` flag (along with its aliases `--autopilot` and `--plan`) lets you l
 copilot --mode agent    # start in agent mode (autonomous tool use)
 copilot --autopilot     # alias for --mode autopilot (allow-all)
 copilot --plan          # start in plan mode (propose without executing)
+```
+
+In v1.0.79+, `--plan` can be combined with `--mode autopilot` to produce a plan first and then execute it automatically in autopilot mode — useful for tasks where you want an explicit planning step before autonomous execution:
+
+```bash
+copilot --plan --mode autopilot "Refactor the authentication module"
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
