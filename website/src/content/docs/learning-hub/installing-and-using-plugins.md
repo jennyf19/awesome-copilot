@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-08
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -73,6 +73,10 @@ The `plugin.json` manifest declares what the plugin contains:
   ]
 }
 ```
+
+### Open Plugin Spec v1
+
+*(v1.0.74+)* Copilot CLI also supports the **Open Plugin Spec v1** manifest format (`mcp.json` configuration alongside an `openapi.json` or equivalent) for interoperability with other MCP-compatible plugin ecosystems. If you encounter a plugin from a non-GitHub source that follows Open Plugin Spec, you can install it directly via the CLI without converting its manifest.
 
 ## Why Use Plugins?
 
@@ -222,6 +226,28 @@ copilot plugin marketplace update
 copilot plugin uninstall my-plugin
 ```
 
+### Automatic Plugin Updates
+
+*(v1.0.78+)* First-party plugins (those from official marketplaces registered by default) automatically update to their latest version at the start of each session. You'll see a notification in the CLI when a plugin is updated. If you need reproducible environments, pin your marketplace to an exact commit SHA (see [Pinning Marketplaces](#pinning-marketplaces)) to prevent automatic updates.
+
+### Enabling and Disabling Plugin Components
+
+*(v1.0.76+)* You can enable or disable individual components of an installed plugin without uninstalling it. This is useful for temporarily toggling specific agents, skills, hooks, or MCP servers:
+
+```bash
+# Disable a specific agent from a plugin
+/plugins disable --plugin my-plugin
+
+# Enable it again
+/plugins enable --plugin my-plugin
+
+# Manage individual MCP servers or skills
+/plugins disable --mcp my-mcp-server
+/plugins disable --skill my-skill
+```
+
+From within a CLI session, use the `/plugins` command to open the interactive plugin manager, where you can toggle components on and off, update, or remove plugins entirely.
+
 ### Loading Plugins from a Local Directory
 
 You can load plugins directly from a local directory without installing them from a marketplace, using the `--plugin-dir` flag when starting Copilot:
@@ -278,7 +304,7 @@ See [Using the Copilot Coding Agent](../using-copilot-coding-agent/) for details
 
 - **Start with a marketplace plugin** before building your own — there may already be one that fits your needs
 - **Keep plugins focused** — a plugin for "Rails development" is better than a plugin for "everything"
-- **Check for updates regularly** — run `copilot plugin update` to get the latest improvements
+- **First-party plugins update automatically** — Official plugins update at each session start; run `copilot plugin update` for others or for immediate updates
 - **Review what you install** — plugins run code on your machine, so inspect unfamiliar plugins before installing
 - **Use plugins for team standards** — publish an internal plugin to ensure every team member has the same agents, skills, and hooks
 - **Remove unused plugins** — declutter with `copilot plugin uninstall` to keep your environment clean

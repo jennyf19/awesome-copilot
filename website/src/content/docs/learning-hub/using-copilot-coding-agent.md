@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-05-13
+lastUpdated: 2026-08-08
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -376,6 +376,26 @@ Since v1.0.47, `--resume` also surfaces **cloud agent sessions that haven't yet 
 | No PR required | You can steer tasks that haven't yet opened a pull request |
 
 > **Note**: Remote control replaces the earlier "steering" feature. If you see references to steering in older documentation, remote control is the updated equivalent.
+
+## Managing Approval Modes
+
+*(v1.0.78+)* Use the `/permissions` command to switch between approval modes for tool use during a session:
+
+```
+/permissions          # open the permissions/approval mode selector
+```
+
+Approval modes control how much the agent can do without asking for explicit confirmation:
+
+| Mode | Behavior |
+|------|----------|
+| **Interactive** (default) | Agent asks before running potentially destructive commands |
+| **Autopilot** | Agent runs all approved tool categories without prompting |
+| **Plan** | Agent plans work without executing file mutations |
+
+You can also switch modes mid-session by changing the mode from the `/permissions` dialog. Changes take effect immediately for the current session.
+
+> **Tip**: If you're running unattended automation with `copilot -p`, combine autopilot mode with hooks to enforce guardrails without requiring interactive approval. See [Automating with Hooks](../automating-with-hooks/) for details.
 
 ## Hooks and the Coding Agent
 
