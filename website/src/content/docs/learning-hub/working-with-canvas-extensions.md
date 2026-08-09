@@ -3,7 +3,7 @@ title: 'Working with Canvas Extensions'
 description: 'Create and iterate on GitHub Copilot app canvases using /create-canvas, then shape them into reusable project or personal extensions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-17
+lastUpdated: 2026-08-09
 estimatedReadingTime: '8 minutes'
 tags:
   - copilot-app
@@ -73,6 +73,10 @@ When creating a canvas extension, choose where it should live:
 - **User scope**: `~/.copilot/extensions` (personal to your machine)
 
 Use project scope when the workflow is team-relevant, and user scope for personal experiments or private workflows.
+
+## Distributing extensions via plugins
+
+As of v1.0.79+, Agent Plugins can bundle canvas extensions. If you maintain a plugin (see [Installing and Using Plugins](../installing-and-using-plugins/)), place your extension under a `com.github.copilot/extensions/` directory inside the plugin package. When users install the plugin, the extension is automatically available in their Copilot app session — no manual copying required.
 
 ## Typical extension structure
 
