@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-11
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -449,6 +449,15 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
 
+**Session-scoped model selection** (v1.0.79+): `/model` is now **session-scoped by default** — changing the model in a running session does not affect future sessions. To set a persistent default model for all future sessions, use `/config model` instead:
+
+```
+/model                   # change model for this session only
+/config model            # set the default model for future sessions
+```
+
+The model picker (v1.0.79+) groups models into **Recent**, **Recommended**, **New**, and other sections for easier browsing. Use **Shift+Tab** to switch between grouping views.
+
 ### CLI Session Commands
 
 The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file:
@@ -555,6 +564,20 @@ In v1.0.66+, you can pass a task description to `/worktree` to name the branch f
 
 This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
 
+*(v1.0.79+)* Use `/worktree new` to start a fresh session in a brand-new worktree, without moving any current changes:
+
+```
+/worktree new my-next-feature
+```
+
+All three worktree entry points (`/worktree`, `/worktree new`, and the `--worktree` startup flag) now default to **HEAD** as the base ref. You can change this with the `worktreeBaseRef` setting in `config.json` if you prefer new worktrees to branch from the remote default branch instead:
+
+```json
+{
+  "worktreeBaseRef": "origin/main"
+}
+```
+
 After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
 
 The `/every` command (also available as `/loop` since v1.0.64) schedules a recurring prompt to run automatically at a specified interval. The companion `/after` command runs a prompt once after a specified delay. Both are useful for self-paced automation — polling for results, periodically summarizing progress, or triggering other slash commands on a timer:
@@ -626,6 +649,8 @@ The `/diagnose` command (v1.0.64+) analyzes the current session's logs and surfa
 Use `/diagnose` when a session is behaving unexpectedly — it inspects session logs and reports what it finds, making it easier to share diagnostics with support or understand what happened internally.
 
 **Keyboard shortcuts for queuing messages**: Use **Ctrl+Q** or **Ctrl+Enter** to queue a message (send it while the agent is still working). **Ctrl+D** no longer queues messages — it now has its default terminal behavior. If you have muscle memory for Ctrl+D queuing, switch to Ctrl+Q.
+
+*(v1.0.79+)* You can also **queue prompts, shell commands, and supported slash commands** to run in order after the current task finishes. Simply type your next prompt while the agent is busy — it will be held in the queue and executed automatically when the agent is free. This lets you line up a series of tasks without waiting for each one to complete.
 
 **Background running tasks**: Press **Ctrl+X → B** to move the current running task or shell command to the background. The task continues executing while you can type a new message or review earlier output. This is useful for long-running commands where you want to interact with the agent while waiting for the result.
 
