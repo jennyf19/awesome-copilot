@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-05-13
+lastUpdated: 2026-08-13
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -376,6 +376,47 @@ Since v1.0.47, `--resume` also surfaces **cloud agent sessions that haven't yet 
 | No PR required | You can steer tasks that haven't yet opened a pull request |
 
 > **Note**: Remote control replaces the earlier "steering" feature. If you see references to steering in older documentation, remote control is the updated equivalent.
+
+## Managing Multiple Concurrent Sessions
+
+*(v1.0.79+)* GitHub Copilot CLI includes a **Sessions tab** and a **sidebar** for managing multiple concurrent sessions without leaving the CLI. Each session runs in its own context and worktree, letting you work on several tasks in parallel.
+
+Key capabilities:
+- **Sessions tab**: Switch between active sessions, see their running status (working, waiting for input, idle), and create new sessions
+- **Sessions sidebar**: A panel alongside your current session that shows all concurrent sessions with live status indicators
+- **New sessions via `/worktree new`**: Start a fresh session in a new git worktree, keeping each task's changes completely isolated from one another
+
+```bash
+# Start a new session in a new worktree
+/worktree new
+```
+
+This builds on the worktree architecture in the GitHub Copilot app — any session started this way gets its own isolated branch, so multiple tasks can proceed in parallel without interfering with each other.
+
+## Prompt Queueing
+
+*(v1.0.79+)* You can queue prompts, shell commands, and supported slash commands so they run in order after the current task finishes, without interrupting the agent mid-turn.
+
+To queue a prompt while the agent is busy, press **Ctrl+Q** instead of Enter. The queued message appears in a pending list and runs automatically when the current turn completes. Use the queue manager to reorder, edit, or remove queued messages.
+
+This is useful when you have a sequence of related tasks and want to pre-stage the next step:
+
+```
+# Type the next prompt while waiting, then press Ctrl+Q to queue it
+fix the failing tests
+```
+
+You can also queue shell commands using `$` (the interactive shell shortcut).
+
+## Managing Permissions with `/permissions`
+
+*(v1.0.78+)* The `/permissions` command lets you switch between approval modes during a session, controlling how much the agent can do autonomously:
+
+```
+/permissions        # show current approval mode and switch interactively
+```
+
+Available modes include interactive (approve each tool call), autopilot (approve all), and plan (read-only planning). This is useful when you want to briefly grant broader permissions for a task and then return to a more cautious mode afterward.
 
 ## Hooks and the Coding Agent
 
