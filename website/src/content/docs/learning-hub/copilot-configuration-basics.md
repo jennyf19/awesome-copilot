@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-13
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -448,6 +448,15 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+
+**Session-scoped model selection** (v1.0.79+): `/model` now changes the model for the **current session only**. To set a persistent default for future sessions, use `/config model` (or its equivalent in the settings dialog). This keeps ad-hoc model switches from accidentally changing your default:
+
+```
+/model claude-sonnet-4.6      # changes model for this session only
+/config model claude-sonnet-4.6  # sets default for all future sessions
+```
+
+**Plan-mode model** (v1.0.74+): Use `/model plan` (or `/model --plan`) to pick a separate model used while in plan mode. Pass a model id, `off` to clear, or no id to open the picker. The plan-mode model automatically reverts to your session model when you leave plan mode, letting you use a faster model for planning and a more capable one for implementation.
 
 ### CLI Session Commands
 
