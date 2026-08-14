@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-14
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -279,9 +279,22 @@ See [Using the Copilot Coding Agent](../using-copilot-coding-agent/) for details
 - **Start with a marketplace plugin** before building your own — there may already be one that fits your needs
 - **Keep plugins focused** — a plugin for "Rails development" is better than a plugin for "everything"
 - **Check for updates regularly** — run `copilot plugin update` to get the latest improvements
+- **Enable auto-update for trusted marketplaces** *(v1.0.79+)* — set `"autoUpdate": true` on an `extraKnownMarketplaces` entry in your user settings to automatically refresh plugins from that marketplace at session start
 - **Review what you install** — plugins run code on your machine, so inspect unfamiliar plugins before installing
 - **Use plugins for team standards** — publish an internal plugin to ensure every team member has the same agents, skills, and hooks
 - **Remove unused plugins** — declutter with `copilot plugin uninstall` to keep your environment clean
+
+> **Breaking change (v1.0.79+)**: If you author plugins using the Agent Plugins spec, components (commands, agents, rules, hooks, LSP config, and extensions) are now only read from a `com.github.copilot/` subdirectory inside the plugin. Files placed directly at the plugin root are no longer loaded. Update your plugin structure accordingly:
+>
+> ```
+> my-plugin/
+> └── com.github.copilot/
+>     ├── agents/
+>     ├── commands/
+>     ├── hooks/
+>     │   └── hooks.json
+>     └── extensions/
+> ```
 
 ## Common Questions
 

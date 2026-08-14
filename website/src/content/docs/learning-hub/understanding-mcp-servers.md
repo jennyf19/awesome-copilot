@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-14
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -361,6 +361,18 @@ A: MCP servers run with the same permissions as your user account. Follow least-
 **Q: How many MCP servers can I configure?**
 
 A: There's no hard limit, but each server is a running process. Configure only the servers you actively use. Most projects use 1–3 servers.
+
+**Q: I've disabled an MCP server in settings — can I re-enable it for one session without changing settings?**
+
+A: Yes. Use the `--enable-mcp-server <name>` flag at startup *(v1.0.79+)* to re-enable a server that was disabled in your settings, for that session only:
+
+```bash
+copilot --enable-mcp-server my-server
+```
+
+**Q: My MCP server is slow to start and Copilot can't see its tools. What should I do?**
+
+A: MCP server timeout settings now also apply to tool discovery *(v1.0.79+)*, with a 30-second default. If your server takes longer to enumerate its tools, increase the `mcpServerTimeout` setting in your configuration to give it more time.
 
 **Q: I'm using an Azure DevOps repository. Will the GitHub MCP server interfere?**
 

@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-14
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -470,6 +470,15 @@ The settings dialog supports search — type to filter settings by name. Changes
 
 These flags mirror the **Repo** and **Repo (local)** scope tabs available in the `/settings` dashboard (v1.0.71+), making it easier to manage per-repository vs. user-global configuration without ambiguity. In v1.0.71+, the `/settings` dashboard also shows **Repo** and **Repo (local)** tabs alongside the existing user-level view, giving you a unified place to see which settings are applied at each layer.
 
+> **Session-scoped model (v1.0.79+)**: `/model` is now **session-scoped by default** — the model you pick with `/model` applies only to the current session and doesn't persist. To set a default model for all future sessions, use `/config model` instead:
+>
+> ```
+> /model gpt-4o           # change model for this session only
+> /config model gpt-4o    # set default for all future sessions
+> ```
+>
+> The model picker also now groups models into **Recent**, **Recommended**, **New**, and other sections. Press **Shift+Tab** to toggle between grouping views.
+
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
 
 | Command | Behaviour |
@@ -556,6 +565,19 @@ In v1.0.66+, you can pass a task description to `/worktree` to name the branch f
 This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
 
 After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
+
+The `/worktree new` command *(v1.0.79+)* creates a new session in a new worktree without moving your current session — useful when you want to start a parallel task while keeping the current session active:
+
+```
+/worktree new my-feature-branch
+```
+
+The `worktreeBaseRef` setting *(v1.0.79+)* controls whether `/worktree`, `/worktree new`, and `--worktree` start from the HEAD of your current branch or from the remote default branch. The default is now **HEAD** (changed from the remote default branch), so new worktrees branch off from wherever you are:
+
+```json
+// settings.json — change base to the remote default branch instead
+{ "worktreeBaseRef": "remote" }
+```
 
 The `/every` command (also available as `/loop` since v1.0.64) schedules a recurring prompt to run automatically at a specified interval. The companion `/after` command runs a prompt once after a specified delay. Both are useful for self-paced automation — polling for results, periodically summarizing progress, or triggering other slash commands on a timer:
 
@@ -706,10 +728,11 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 The `/autopilot` command (v1.0.45+) is a quick in-session toggle that switches between **interactive mode** (where the agent pauses to ask for confirmation before tool use) and **autopilot mode** (where it runs autonomously). Unlike `/allow-all` which specifically controls whether tool permissions are required, `/autopilot` toggles the overall agent mode:
 
 ```
-/autopilot        # toggle between interactive and autopilot modes
+/autopilot              # toggle between interactive and autopilot modes
+/autopilot <objective>  # set an explicit objective and run autopilot (v1.0.79+)
 ```
 
-Use `/autopilot` when you want to flip between supervised and unsupervised operation mid-session without typing out the full `/allow-all on` or `/allow-all off` commands.
+Use `/autopilot` when you want to flip between supervised and unsupervised operation mid-session without typing out the full `/allow-all on` or `/allow-all off` commands. With `/autopilot <objective>` *(v1.0.79+)*, you can set an explicit goal for the agent to accomplish autonomously — no experimental flag required.
 
 > **Enhanced autopilot (v1.0.64+)**: When autopilot mode is active — including when launched with `--autopilot` at startup or during automatic continuation turns — the agent automatically handles elicitation dialogs, `ask_user` prompts, sampling requests, and permission prompts without surfacing them as interactive dialogs. This means long-running automated sessions can proceed end-to-end without manual confirmation steps.
 
@@ -743,6 +766,12 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+> **Combined plan and autopilot (v1.0.79+)**: Combine `--plan` with `--mode autopilot` to have the agent create a plan first and then implement it without waiting for your approval:
+>
+> ```bash
+> copilot --plan --mode autopilot "Refactor the authentication module"
+> ```
 
 The `--max-autopilot-continues` flag controls how many times Copilot can automatically continue in autopilot mode before pausing for confirmation. The default is 5:
 
