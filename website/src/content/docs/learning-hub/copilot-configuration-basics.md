@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-16
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -449,6 +449,18 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
 
+**Model picker grouping** (v1.0.79+): The model picker now organises available models into sections — **Recent**, **Recommended**, and **New** — making it easier to find the right model. Press **Shift+Tab** to switch between grouping views.
+
+**Session-scoped `/model`** (v1.0.79+): The `/model` command is now **session-scoped by default**, meaning a model you choose in the picker only applies to the current session. To set a persistent default that applies to all future sessions, use `/config model`:
+
+```
+/model                  # pick a model for this session only
+/config model           # set the default model for all future sessions
+/model --local          # view/edit your personal model preference (persistent)
+```
+
+This change prevents accidental global model changes when you're just trying a different model for a single task.
+
 ### CLI Session Commands
 
 The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file:
@@ -706,14 +718,15 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 The `/autopilot` command (v1.0.45+) is a quick in-session toggle that switches between **interactive mode** (where the agent pauses to ask for confirmation before tool use) and **autopilot mode** (where it runs autonomously). Unlike `/allow-all` which specifically controls whether tool permissions are required, `/autopilot` toggles the overall agent mode:
 
 ```
-/autopilot        # toggle between interactive and autopilot modes
+/autopilot              # toggle between interactive and autopilot modes
+/autopilot <objective>  # set an explicit goal and switch to autopilot (v1.0.79+)
 ```
 
-Use `/autopilot` when you want to flip between supervised and unsupervised operation mid-session without typing out the full `/allow-all on` or `/allow-all off` commands.
+Use `/autopilot` when you want to flip between supervised and unsupervised operation mid-session without typing out the full `/allow-all on` or `/allow-all off` commands. As of v1.0.79, you can pass an objective directly (`/autopilot <objective>`) without needing experimental features enabled.
 
 > **Enhanced autopilot (v1.0.64+)**: When autopilot mode is active — including when launched with `--autopilot` at startup or during automatic continuation turns — the agent automatically handles elicitation dialogs, `ask_user` prompts, sampling requests, and permission prompts without surfacing them as interactive dialogs. This means long-running automated sessions can proceed end-to-end without manual confirmation steps.
 
-> **Auto allow-all mode (v1.0.69+)**: In addition to the standard allow-all mode (which approves everything), the CLI now supports an **auto allow-all** mode that uses an LLM judge to evaluate each tool request. When enabled, the judge automatically approves requests it evaluates as acceptable, and asks you for manual confirmation only for requests it considers risky. This gives you a middle ground between full autopilot and fully supervised operation — most routine actions proceed automatically while unusual or potentially dangerous actions still surface for your review. As of v1.0.69-3, this mode requires experimental features to be enabled — use `/experimental on` or start the CLI with `--experimental` — then activate it with `/allow-all auto`. The previous `AUTO_APPROVAL` environment variable approach has been removed in favour of experimental mode.
+> **Auto allow-all mode (v1.0.69+)**: In addition to the standard allow-all mode (which approves everything), the CLI now supports an **auto allow-all** mode that uses an LLM judge to evaluate each tool request. When enabled, the judge automatically approves requests it evaluates as acceptable, and asks you for manual confirmation only for requests it considers risky. This gives you a middle ground between full autopilot and fully supervised operation — most routine actions proceed automatically while unusual or potentially dangerous actions still surface for your review. Activate it with `/allow-all auto`. Enterprise environments can enforce `allow-auto-only` policy (v1.0.79+), which lets `/allow-all auto` work while blocking full `/allow-all on`. The previous `AUTO_APPROVAL` environment variable approach has been removed in favour of this mode.
 
 > **Read-only `gh` CLI commands (v1.0.46+)**: Read-only `gh` commands — such as `gh issue list`, `gh pr view`, `gh run status`, and other commands that don't write to GitHub — are **automatically approved** without a permission prompt. Only commands that write to GitHub (like creating issues, merging PRs) still require explicit approval. This reduces friction during exploratory sessions where you frequently check issue or PR status.
 
@@ -743,6 +756,14 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+**Plan-then-implement** (v1.0.79+): Combine `--plan` with `--mode autopilot` to have the CLI generate a plan first and then implement it autonomously — without waiting for your approval between the two phases:
+
+```bash
+copilot --plan --mode autopilot "Add rate limiting to all API endpoints"
+```
+
+This is a good default for well-understood tasks where you trust the agent's planning — it generates a concrete plan, then executes it end-to-end.
 
 The `--max-autopilot-continues` flag controls how many times Copilot can automatically continue in autopilot mode before pausing for confirmation. The default is 5:
 
