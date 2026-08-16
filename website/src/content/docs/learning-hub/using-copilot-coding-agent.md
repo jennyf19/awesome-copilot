@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-05-13
+lastUpdated: 2026-08-16
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -376,6 +376,27 @@ Since v1.0.47, `--resume` also surfaces **cloud agent sessions that haven't yet 
 | No PR required | You can steer tasks that haven't yet opened a pull request |
 
 > **Note**: Remote control replaces the earlier "steering" feature. If you see references to steering in older documentation, remote control is the updated equivalent.
+
+## Managing Multiple Sessions
+
+*(v1.0.79+)* The **Sessions tab** in Copilot CLI lets you manage multiple concurrent sessions without leaving the terminal. This is especially powerful when running the coding agent on several tasks simultaneously:
+
+- View all active sessions and their current status (running, waiting on input, or idle)
+- Switch between sessions with `h`
+- Create a new session with `n`
+- Dispose a session directly from the list
+
+This replaces the need to open multiple terminals or track session IDs manually.
+
+### Worktree-Based Isolation
+
+Use `/worktree new` *(v1.0.79+)* to start a new coding agent session in a fresh git worktree — giving each task its own isolated branch and working directory:
+
+```
+/worktree new    # start a new session in a new worktree
+```
+
+Combined with the Sessions tab, this makes it easy to run several independent coding tasks in parallel: each task works in its own worktree, and you can switch between them to check progress or provide steering.
 
 ## Hooks and the Coding Agent
 
