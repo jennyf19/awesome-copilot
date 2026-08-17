@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-17
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -429,6 +429,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `worktreeBaseRef` | Controls whether `/worktree`, `/worktree new`, and `--worktree` start from `HEAD` or the remote default branch. Defaults to `HEAD`. (v1.0.79+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -448,6 +449,17 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+
+**Model picker grouping** (v1.0.79+): The model picker groups models into **Recent**, **Recommended**, **New**, and other sections. Press **Shift+Tab** to switch between grouping views, making it easier to find newly added models or return to frequently used ones.
+
+**Session-scoped `/model` and `/config model`** (v1.0.79+): The `/model` command is now **session-scoped by default** — changing the model in a session does not affect future sessions. To set a persistent model default for future sessions, use `/config model` instead:
+
+```
+/model claude-sonnet-4.6          # change model for this session only
+/config model claude-sonnet-4.6   # set default for future sessions
+```
+
+This replaces the previous behavior where `/model --local` was needed to persist model preferences. The `--repo` and `--local` flags on `/model` still work for explicit scoping of repository or local settings.
 
 ### CLI Session Commands
 
@@ -556,6 +568,21 @@ In v1.0.66+, you can pass a task description to `/worktree` to name the branch f
 This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
 
 After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
+
+*(v1.0.79+)* Use `/worktree new` to start a completely new session in a new worktree, without carrying over any uncommitted changes from the current session:
+
+```
+/worktree new
+/worktree new my-feature-branch
+```
+
+The `worktreeBaseRef` setting (v1.0.79+) controls where the worktree branches from. Set it to `"head"` (the default) to start from your current `HEAD`, or `"remote"` to start from the remote default branch:
+
+```json
+{
+  "worktreeBaseRef": "remote"
+}
+```
 
 The `/every` command (also available as `/loop` since v1.0.64) schedules a recurring prompt to run automatically at a specified interval. The companion `/after` command runs a prompt once after a specified delay. Both are useful for self-paced automation — polling for results, periodically summarizing progress, or triggering other slash commands on a timer:
 
@@ -740,9 +767,10 @@ The `--mode` flag (along with its aliases `--autopilot` and `--plan`) lets you l
 copilot --mode agent    # start in agent mode (autonomous tool use)
 copilot --autopilot     # alias for --mode autopilot (allow-all)
 copilot --plan          # start in plan mode (propose without executing)
+copilot --plan --mode autopilot  # plan first, then implement without waiting for approval (v1.0.79+)
 ```
 
-This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt. Combining `--plan` with `--mode autopilot` lets the agent produce a plan and then automatically implement it end-to-end.
 
 The `--max-autopilot-continues` flag controls how many times Copilot can automatically continue in autopilot mode before pausing for confirmation. The default is 5:
 
