@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-18
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -21,6 +21,31 @@ prerequisites:
 Plugins are installable packages that extend GitHub Copilot CLI with reusable agents, skills, hooks, and servers, all bundled into a single unit you can install with one command. Instead of manually copying agent files and configuring MCP servers across every project, plugins let you install a curated set of capabilities and share them with your team.
 
 This article explains what plugins contain, how to find and install them, and how to manage your plugin library.
+
+## Plugin File Structure (v1.0.80+)
+
+> **Breaking change in v1.0.80**: The Agent Plugins spec now requires that plugin components (`commands/`, `agents/`, `rules/`, `hooks/hooks.json`, `lsp.json`, and `extensions/`) live under a `com.github.copilot/` namespace directory inside the plugin, rather than directly at the plugin root. Plugins that place these files at the root level will have those components silently dropped. If you maintain a plugin and notice components are missing after updating, move them into `com.github.copilot/`.
+
+Here is the updated structure for a plugin targeting v1.0.80+:
+
+```
+my-plugin/
+├── .github/
+│   └── plugin/
+│       └── plugin.json        # Plugin manifest (name, description, version)
+├── com.github.copilot/        # All plugin components go under this namespace
+│   ├── agents/
+│   │   ├── api-architect.agent.md
+│   │   └── test-specialist.agent.md
+│   ├── skills/
+│   │   └── database-migrations/
+│   │       ├── SKILL.md
+│   │       └── scripts/migrate.sh
+│   └── hooks.json
+└── README.md
+```
+
+> **Tip**: The CLI now reports which files are in the wrong location and where to move them, so you can diagnose structural problems without losing components silently.
 
 ## What's Inside a Plugin?
 

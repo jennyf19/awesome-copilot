@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-18
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -121,6 +121,8 @@ This guided flow is the recommended way to add new MCP servers, especially for s
 **type** (remote servers): The transport type for remote MCP servers (`http` or `sse`). This field can now be omitted — the CLI defaults to `http` when no type is specified, simplifying remote server configuration.
 
 **deferTools** *(optional, v1.0.63+)*: When set to `false`, the server's tools are always available even when tool search is enabled. By default, tool search can hide rarely-used MCP tools to reduce context noise; setting `deferTools: false` on a server prevents its tools from being deferred, keeping them permanently in the tool list.
+
+**timeout** *(optional)*: MCP server timeout settings now apply to both tool invocations and tool discovery. The default discovery timeout is 30 seconds, which accommodates slow-starting servers (for example, those that install packages on first run via `npx`). You can increase the timeout for servers that need more time to initialize:
 
 ### Allowing MCP Server Instructions
 
@@ -316,6 +318,14 @@ For example, a PostgreSQL server that can't connect because `DATABASE_URL` is no
 You can also open the `/mcp` manager while the agent is working to toggle servers on or off mid-turn. Add, edit, delete, and re-auth actions wait until the turn finishes, but enabling or disabling a server takes effect immediately.
 
 **Toggling servers on and off** (v1.0.66+): From the `/mcp` list view, you can **enable or disable individual MCP servers** without editing your config file. Select a server in the list and toggle it — disabled servers won't start in future sessions and their tools won't be available to agents. This is useful for temporarily disabling a server that's causing slowdowns or errors without removing it from your configuration entirely.
+
+**Re-enabling a server for a single run** (v1.0.79+): If you have a server disabled in your settings but need it for a specific session, use the `--enable-mcp-server` flag at startup to re-enable it for that run only without changing your saved settings:
+
+```bash
+copilot --enable-mcp-server postgres "Run the schema analysis"
+```
+
+This is useful for servers you keep disabled by default but occasionally need for specialized tasks.
 
 **Common causes and fixes**:
 
