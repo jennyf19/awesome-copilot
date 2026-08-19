@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-19
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -449,6 +449,21 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
 
+**Model picker grouping** (v1.0.79+): The model picker groups models into **Recent**, **Recommended**, **New**, and other sections. Use **Shift+Tab** to switch between grouping views.
+
+**Supported models**: GitHub Copilot CLI supports a growing catalogue of models, including Anthropic's Claude Sonnet and Opus families, OpenAI GPT models, Google Gemini models (including Gemini 3.7 Flash, added in v1.0.81), and third-party models such as `kimi-k3` (v1.0.79) and `grok-4.5` (v1.0.76). The full list of available models depends on your plan and is surfaced in the model picker.
+
+**`/model plan`** (v1.0.74+): Pick a separate model to use while the session is in plan mode, independently of the main session model:
+
+```
+/model plan              # open the picker to choose a plan-mode model
+/model plan gpt-4.1      # set a specific model for plan mode
+/model plan off          # clear the plan-mode model override (reverts to session model)
+/model --plan            # alias for /model plan
+```
+
+This is useful when you want a lighter or cheaper model to draft the plan, while reserving a more capable model for the actual implementation turn.
+
 ### CLI Session Commands
 
 The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file:
@@ -507,6 +522,24 @@ You can also press **x** on a highlighted session in the session picker (`--resu
 
 In the session picker, press **`s`** to cycle the sort order: relevance, last used, created, or name. The picker also shows the branch name and idle/in-use status for each session.
 
+#### Sessions Sidebar for Concurrent Work
+
+*(v1.0.76+)* The **Sessions sidebar** lets you manage multiple concurrent sessions without leaving your current conversation. It appears as a split panel showing all your running and backgrounded sessions, with status indicators and quick-switch controls:
+
+- Switch between sessions without losing context in any of them
+- Spawn new sessions directly from the sidebar
+- See the status of each session at a glance (working, idle, waiting for input)
+
+Enable the Sessions sidebar with:
+
+```
+/experimental on         # enable experimental features if not already on
+```
+
+The sidebar is on by default in v1.0.79+. Combined with `/worktree new`, this makes it practical to run several independent agent tasks in parallel — each session in its own worktree, all visible from a single terminal window.
+
+> **Tip**: Hover-to-focus is off by default (opt in with `sidebar.hoverFocus`). The active session card is highlighted by default (opt out with `sidebar.accentActiveSession: false`).
+
 The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
 
 ```
@@ -556,6 +589,16 @@ In v1.0.66+, you can pass a task description to `/worktree` to name the branch f
 This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
 
 After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
+
+The `/worktree new` command *(v1.0.79+)* is a variant that starts a **fresh session** in a new worktree, rather than moving the current session into one. Use it when you want to spin up an entirely separate conversation context for a parallel task while keeping the current session running uninterrupted:
+
+```
+/worktree new fix the payment-service bug
+```
+
+This creates a new worktree for a branch named from the task description and opens a new session inside it — without affecting your active session. You can then switch between sessions using the Sessions sidebar or the `--resume` picker.
+
+> **Tip**: Combine `/worktree new` with the Sessions sidebar (see below) to manage several parallel workstreams at once.
 
 The `/every` command (also available as `/loop` since v1.0.64) schedules a recurring prompt to run automatically at a specified interval. The companion `/after` command runs a prompt once after a specified delay. Both are useful for self-paced automation — polling for results, periodically summarizing progress, or triggering other slash commands on a timer:
 
@@ -716,6 +759,14 @@ Use `/autopilot` when you want to flip between supervised and unsupervised opera
 > **Auto allow-all mode (v1.0.69+)**: In addition to the standard allow-all mode (which approves everything), the CLI now supports an **auto allow-all** mode that uses an LLM judge to evaluate each tool request. When enabled, the judge automatically approves requests it evaluates as acceptable, and asks you for manual confirmation only for requests it considers risky. This gives you a middle ground between full autopilot and fully supervised operation — most routine actions proceed automatically while unusual or potentially dangerous actions still surface for your review. As of v1.0.69-3, this mode requires experimental features to be enabled — use `/experimental on` or start the CLI with `--experimental` — then activate it with `/allow-all auto`. The previous `AUTO_APPROVAL` environment variable approach has been removed in favour of experimental mode.
 
 > **Read-only `gh` CLI commands (v1.0.46+)**: Read-only `gh` commands — such as `gh issue list`, `gh pr view`, `gh run status`, and other commands that don't write to GitHub — are **automatically approved** without a permission prompt. Only commands that write to GitHub (like creating issues, merging PRs) still require explicit approval. This reduces friction during exploratory sessions where you frequently check issue or PR status.
+
+The `/permissions` command *(v1.0.78+)* provides a menu-driven way to switch between approval modes for the current session. Instead of typing `/allow-all on` or `/allow-all auto`, you can open the permissions menu and pick the mode you want:
+
+```
+/permissions
+```
+
+The menu presents all available approval modes (interactive, auto, allow-all) along with a description of what each one does. Use it when you are unsure which mode to choose or want a quick reminder of the tradeoffs.
 
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
