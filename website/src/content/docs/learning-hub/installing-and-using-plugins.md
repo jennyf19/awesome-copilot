@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-19
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -182,6 +182,24 @@ Pinning to a SHA guarantees that everyone on the team installs plugins from exac
 - **Change control** — review and approve plugin updates before rolling them out team-wide
 - **Stability** — prevent breaking changes in upstream marketplaces from impacting your team without notice
 
+### Auto-Updating a Marketplace at Session Start
+
+*(v1.0.79+)* Set `"autoUpdate": true` on an `extraKnownMarketplaces` entry to automatically fetch the latest plugin list from that marketplace each time a session starts:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-org-plugins",
+      "source": "my-org/internal-plugins",
+      "autoUpdate": true
+    }
+  ]
+}
+```
+
+This is useful for internal marketplaces where you always want the freshest plugin catalog without running `copilot plugin marketplace update` manually. Note that `autoUpdate` and `sha` are mutually exclusive — if you pin to a SHA, auto-updating is disabled for that entry.
+
 ## Installing Plugins
 
 ### From Copilot CLI
@@ -222,6 +240,27 @@ copilot plugin marketplace update
 copilot plugin uninstall my-plugin
 ```
 
+### Enabling and Disabling Plugins
+
+*(v1.0.76+)* You can enable or disable individual plugins, agents, skills, MCP servers, hooks, and LSP servers contributed by a plugin using the `/plugins` command inside an interactive session:
+
+```
+/plugins                            # open the plugins management panel
+/plugins enable my-plugin           # enable a disabled plugin
+/plugins disable my-plugin          # disable a plugin without uninstalling it
+/plugins update my-plugin           # update a plugin to the latest version
+/plugins uninstall my-plugin        # remove a plugin entirely
+```
+
+The `--plugin`, `--mcp`, `--skill`, `--agent`, and `--hook` flags let you target specific components:
+
+```
+/plugins disable --skill my-plugin:database-migrations   # disable just one skill
+/plugins disable --mcp my-plugin:postgres                # disable just one MCP server
+```
+
+Disabling a plugin (rather than uninstalling it) is useful when you want to temporarily remove a set of agents or hooks from your session without losing the installation.
+
 ### Loading Plugins from a Local Directory
 
 You can load plugins directly from a local directory without installing them from a marketplace, using the `--plugin-dir` flag when starting Copilot:
@@ -247,6 +286,18 @@ When you install a plugin, its components become available to Copilot CLI automa
 - **MCP servers** extend the tools available to agents
 
 You don't need to do any additional configuration after installing — the plugin's components integrate seamlessly into your workflow. Plugins take effect immediately after installation without requiring a Copilot CLI restart.
+
+### Plugins in Non-Interactive Runs
+
+*(Fixed in v1.0.81+)* Agents, skills, and MCP servers contributed by installed plugins are fully available in **non-interactive (`-p`) mode**, including when using `--agent <plugin>:<agent>` headlessly without `--plugin-dir`:
+
+```bash
+# Run a plugin-provided agent in non-interactive mode
+copilot -p "Analyze the API surface and suggest improvements" \
+  --agent awesome-copilot:api-architect
+```
+
+Previously, plugin components were silently dropped in non-interactive runs unless you explicitly passed `--plugin-dir`. This is now fixed — installed plugins are loaded the same way in both interactive and non-interactive sessions.
 
 ## Plugins from This Repository
 
