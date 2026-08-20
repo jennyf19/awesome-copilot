@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-20
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -445,9 +445,20 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+*(v1.0.79+)* The model picker groups models into **Recent**, **Recommended**, **New**, and other sections. Use **Shift+Tab** to switch between grouping views.
+
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+
+**Session-scoped model selection** *(v1.0.79+)*: The `/model` command is now **session-scoped by default** — the model you pick applies only to the current session. To set the default model for future sessions, use `/config model` instead:
+
+```
+/model                      # pick a model for the current session only
+/config model               # set your default model for all future sessions
+/model --repo               # pin a model for this repository
+/model --local              # set your personal model preference (user-level)
+```
 
 ### CLI Session Commands
 
@@ -459,13 +470,13 @@ The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edi
 
 The settings dialog supports search — type to filter settings by name. Changes take effect immediately.
 
-*(v1.0.70+)* The `/settings` command and the `/model` command both support **`--repo` and `--local` flags** for explicitly scoping which layer of settings you want to view or edit:
+*(v1.0.70+)* The `/settings` command supports **`--repo` and `--local` flags** for explicitly scoping which layer of settings you want to view or edit. In v1.0.79+, these flags also work with `/model` for persistent model preferences (as opposed to the default session-scoped `/model`):
 
 ```
 /settings --repo    # view/edit repository-scoped settings
 /settings --local   # view/edit local (user-level) settings
-/model --repo       # view/edit the model pinned for this repository
-/model --local      # view/edit your personal model preference
+/model --repo       # pin a model for this repository (persistent)
+/model --local      # set your personal model preference (persistent, user-level)
 ```
 
 These flags mirror the **Repo** and **Repo (local)** scope tabs available in the `/settings` dashboard (v1.0.71+), making it easier to manage per-repository vs. user-global configuration without ambiguity. In v1.0.71+, the `/settings` dashboard also shows **Repo** and **Repo (local)** tabs alongside the existing user-level view, giving you a unified place to see which settings are applied at each layer.
