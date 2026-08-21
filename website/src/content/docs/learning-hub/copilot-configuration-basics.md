@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-21
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -429,6 +429,8 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `defaultMode` | Default mode for new interactive sessions (`interactive`, `plan`, or `autopilot`); avoids having to set your preferred mode on each startup (v1.0.81+) |
+| `defaultPermissionMode` | Default approval behavior for new interactive sessions, such as auto-approving safe tool calls on launch (v1.0.81+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -448,6 +450,8 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+
+**Gemini 3.7 Flash** (v1.0.81+): Google's Gemini 3.7 Flash model is now available and can be selected directly from the model picker or via the `gemini` family alias. It offers fast, cost-effective responses well suited to high-frequency tasks.
 
 ### CLI Session Commands
 
@@ -494,6 +498,8 @@ You can also name a session at startup with the `--name` flag, and resume it by 
 copilot --name "auth-refactor"          # start a session with a given name
 copilot --resume="auth-refactor"        # resume that session by name
 ```
+
+**Session restore on startup** (v1.0.81+): If the CLI exits unexpectedly — due to a crash, a machine restart, or a terminal being closed — it now detects sessions that were still open and prompts you to restore them on the next startup. This means you no longer lose your working context after an accidental exit; your active sessions are offered for restoration automatically.
 
 The `/session delete` command removes sessions you no longer need:
 
@@ -566,7 +572,7 @@ The `/every` command (also available as `/loop` since v1.0.64) schedules a recur
 /every 1d /chronicle standup              # daily standup report via /chronicle
 ```
 
-The interval can be specified in seconds (`s`), minutes (`m`), or hours (`h`), and both commands can invoke other slash commands as their payload. To see and manage all your scheduled prompts, use `/every` with no argument — it opens the schedule manager. To cancel a running schedule, use `/every stop` or **Ctrl+C**.
+The interval can be specified in seconds (`s`), minutes (`m`), or hours (`h`), and both commands can invoke other slash commands as their payload. To see and manage all your scheduled prompts, use `/every` with no argument — it opens the schedule manager. In the schedule manager, press **`x`** on a highlighted entry to remove it (v1.0.81+). To cancel a running schedule from the command line, use `/every stop` or **Ctrl+C**.
 
 > **Experimental**: `/every`, `/loop`, and `/after` are part of the experimental feature set. They appear in the `/experimental` slash command list — enable experimental features if they are not already visible in your current session.
 
