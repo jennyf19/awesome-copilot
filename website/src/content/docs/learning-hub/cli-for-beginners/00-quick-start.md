@@ -3,7 +3,7 @@ title: '00 · Quick Start'
 description: 'Install GitHub Copilot CLI, authenticate, and verify your environment with the same flow as the source course.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-05-08
+lastUpdated: 2026-08-21
 ---
 
 ![Chapter 00: Quick Start](/images/learning-hub/copilot-cli-for-beginners/00/chapter-header.png)
@@ -44,9 +44,9 @@ If you see "You don't have access to GitHub Copilot," you'll need to use the fre
 
 > ⏱️ **Time estimate**: Installation takes 2-5 minutes. Authentication adds another 1-2 minutes.
 
-### Recommended: GitHub Codespaces (Zero Setup)
+### GitHub Codespaces (Zero Setup)
 
-If you don't want to install any of the prerequisites, you can use GitHub Codespaces, which has the GitHub Copilot CLI ready to go (you'll need to sign in), pre-installs Python 3.13, pytest, and the GitHub CLI.
+If you don't want to install any of the prerequisites you can use GitHub Codespaces, which has the GitHub Copilot CLI ready to go (you'll need to sign in), and pre-installs Python and pytest.
 
 1. [Fork this repository](https://github.com/github/copilot-cli-for-beginners/fork) to your GitHub account
 2. Select **Code** > **Codespaces** > **Create codespace on main**
@@ -55,13 +55,24 @@ If you don't want to install any of the prerequisites, you can use GitHub Codesp
 
 > 💡 **Verify in Codespace**: Run `cd samples/book-app-project && python book_app.py help` to confirm Python and the sample app are working.
 
-### Alternative: Local Installation
+### Local Installation
 
-> 💡 **Not sure which to pick?** Use `npm` if you have Node.js installed. Otherwise, choose the option that matches your system.
+Follow these steps if you'd like to run Copilot CLI on your local machine with the course samples.
 
-> 💡 **Python required for demos**: The course uses a Python sample app. If you're working locally, install [Python 3.10+](https://www.python.org/downloads/) before starting the demos.
+1. Clone the repo to get the course samples on your machine:
 
-> **Note:** While the primary examples shown throughout the course use Python (`samples/book-app-project`), JavaScript (`samples/book-app-project-js`) and C# (`samples/book-app-project-cs`) versions are also available if you prefer to work with those languages. Each sample has a README with instructions for running the app in that language.
+    ```bash
+    git clone https://github.com/github/copilot-cli-for-beginners
+    cd copilot-cli-for-beginners
+    ```
+
+2. Install Copilot CLI using one of the following options.
+
+    > 💡 **Not sure which to pick?** Use `npm` if you have Node.js installed. Otherwise, choose the option that matches your system.
+
+    > 💡 **Python required for demos**: The course uses a Python sample app. If you're working locally, install [Python 3.10+](https://www.python.org/downloads/) before starting the demos.
+
+    > **Note:** While the primary examples shown throughout the course use Python (`samples/book-app-project`), JavaScript (`samples/book-app-project-js`) and C# (`samples/book-app-project-cs`) versions are also available if you prefer to work with those languages. Each sample has a README with instructions for running the app in that language.
 
 Choose the method that works for your system:
 
@@ -135,17 +146,20 @@ After trusting the folder, you can sign in with your GitHub account.
 > /login
 ```
 
-**What happens next:**
+**What happens next (local terminal):**
 
-1. Copilot CLI displays a one-time code (like `ABCD-1234`)
-2. Your browser opens to GitHub's device authorization page. Sign in to GitHub if you haven't already.
-3. Enter the code when prompted
-4. Select "Authorize" to grant GitHub Copilot CLI access
-5. Return to your terminal - you're now signed in!
+1. Choose to sign into your GitHub.com account or an enterprise account.
+2. Select `Sign in with your browser (recommended)`
+3. Your browser opens automatically to GitHub's authorization page. Sign in to GitHub if you haven't already.
+4. Select "Authorize" to grant GitHub Copilot CLI access.
+5. Return to your terminal — you're now signed in!
 
-<img src="/images/learning-hub/copilot-cli-for-beginners/00/auth-device-flow.png" alt="Device Authorization Flow - showing the 5-step process from terminal login to signed-in confirmation" width="800"/>
+> 💡 **Remote or headless terminals**: If you're on a remote server or a terminal without a browser (such as SSH), Copilot CLI falls back to the **device code flow** instead. You'll see a one-time code like `ABCD-1234`. Visit [github.com/login/device](https://github.com/login/device) in a browser on another machine and enter the code to complete sign-in. To force a specific flow, use `copilot login --web-flow` to use the browser popup or `copilot login --device-code` to use the code-based flow. You can also pick interactively with `/login`.
+> 
+> <img src="/images/learning-hub/copilot-cli-for-beginners/00/auth-device-flow.png" alt="Device Authorization Flow - showing the 5-step process from terminal login to signed-in confirmation" width="800"/>
+>
 
-*The device authorization flow: your terminal generates a code, you verify it in the browser, and Copilot CLI is authenticated.*
+*The browser-based flow: your browser opens automatically and you authorize in one click. On remote/headless terminals, a device code is shown instead.*
 
 **Tip**: The sign-in persists across sessions. You only need to do this once unless your token expires or you explicitly sign out.
 
@@ -186,14 +200,12 @@ After you receive a response, you can exit the CLI:
 
 The course provides a sample app that you'll explore and improve throughout the course using the CLI *(You can see the code for this in /samples/book-app-project)*. Check that the *Python book collection terminal app* works before you get started. Run `python` or `python3` depending on your system.
 
-> **Note:** While the primary examples shown throughout the course use Python (`samples/book-app-project`), JavaScript (`samples/book-app-project-js`) and C# (`samples/book-app-project-cs`) versions are also available if you prefer to work with those languages. Each sample has a README with instructions for running the app in that language.
+> **Note:** The primary examples shown throughout the course use Python (`samples/book-app-project`) so you'll need to have [Python 3.10+](https://www.python.org/downloads/) available on your local machine if you chose that option (the Codespace already has it installed). JavaScript (`samples/book-app-project-js`) and C# (`samples/book-app-project-cs`) versions are also available if you prefer to work with those languages. Each sample has a README with instructions for running the app in that language.
 
 ```bash
 cd samples/book-app-project
 python book_app.py list
 ```
-
-**Expected output**: A list of 5 books including "The Hobbit", "1984", and "Dune".
 
 ### Step 3: Try Copilot CLI with the Book App
 
@@ -259,7 +271,7 @@ copilot
 
 ### Browser doesn't open automatically
 
-Manually visit [github.com/login/device](https://github.com/login/device) and enter the code shown in your terminal.
+On remote or headless terminals, the device code flow is used instead. Your terminal will display a one-time code. Visit [github.com/login/device](https://github.com/login/device) and enter the code, then authorize access.
 
 ### Token expired
 
