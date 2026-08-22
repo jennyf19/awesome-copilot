@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-05-13
+lastUpdated: 2026-08-22
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -443,6 +443,16 @@ A: Yes. The coding agent can work on multiple issues in parallel, each in its ow
 **Q: Does the coding agent use my custom agents and skills?**
 
 A: Yes. You can specify which agent to use when assigning work — the coding agent adopts that agent's persona, tools, and guardrails. Skills are loaded automatically when the agent determines they're relevant to the task, based on the skill's description.
+
+**Q: Can I track how much each agent used during a session?**
+
+A: Yes. *(v1.0.81+)* Use the `--usage-output-file` flag to write a JSON file with per-agent usage metrics after a session ends. This is useful for auditing token consumption across agents in complex multi-agent workflows:
+
+```bash
+copilot --usage-output-file usage.json
+```
+
+The output file breaks down input/output token usage per agent, making it easy to identify which agents are most expensive and optimize accordingly.
 
 ## Next Steps
 
