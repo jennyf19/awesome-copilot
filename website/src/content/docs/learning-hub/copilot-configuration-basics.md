@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-23
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -206,6 +206,16 @@ In addition to repository-level skills, GitHub Copilot CLI supports **personal s
 ```
 
 The `~/.agents/skills/` path aligns with the VS Code GitHub Copilot for Azure extension's default skill discovery path, while `~/.copilot/skills/` matches the Copilot CLI configuration directory. Both are supported for personal skills.
+
+### Adding Extra Discovery Directories
+
+*(v1.0.81+)* You can extend discovery beyond the default locations using the `--add-dir` flag when starting Copilot. Skills and custom agents found in the specified directory are loaded for that session:
+
+```bash
+copilot --add-dir /path/to/shared-skills
+```
+
+This is useful for teams who maintain a shared directory of agents or skills outside of a Git repository, or when working with skills stored in a location that Copilot doesn't discover by default.
 
 ### Pinning Model and Effort via `.github/copilot/settings.json`
 
@@ -429,6 +439,8 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `defaultMode` | Choose the startup mode for new interactive sessions (`interactive`, `plan`, or `autopilot`) (v1.0.81+) |
+| `defaultPermissionMode` | Choose the default approval behavior for new interactive sessions (`auto`, `bypass`, or a custom mode) (v1.0.81+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -494,6 +506,8 @@ You can also name a session at startup with the `--name` flag, and resume it by 
 copilot --name "auth-refactor"          # start a session with a given name
 copilot --resume="auth-refactor"        # resume that session by name
 ```
+
+*(v1.0.81+)* **Automatic session restore**: When you start Copilot after a crash or machine restart, the CLI detects sessions that were open when the process exited and offers to restore them — so you can pick up exactly where you left off without manually reopening each terminal window.
 
 The `/session delete` command removes sessions you no longer need:
 
