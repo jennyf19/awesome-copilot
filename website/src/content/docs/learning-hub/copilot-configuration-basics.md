@@ -3,10 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
-estimatedReadingTime: '10 minutes'
-tags:
-  - configuration
+lastUpdated: 2026-08-24
   - setup
   - fundamentals
 relatedArticles:
@@ -420,7 +417,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | Setting | Description |
 |---------|-------------|
 | `includeCoAuthoredBy` | Include Co-authored-by trailer in commits |
-| `effortLevel` | Default reasoning effort level (`low`, `medium`, `high`) |
+| `effortLevel` | Default reasoning effort level (`low`, `medium`, `high`, `xhigh` — xhigh is available on supported models such as Grok 4.6) |
 | `autoUpdatesChannel` | Update channel (`stable`, `preview`) |
 | `statusLine` | Show status line in the terminal UI |
 | `include_gitignored` | Include gitignored files in `@` file search |
@@ -429,6 +426,8 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `defaultMode` | Default mode for new interactive sessions (`agent`, `plan`, `ask`) — sets the startup mode without needing `--mode` on every launch (v1.0.81-6+) |
+| `defaultPermissionMode` | Default approval behavior for new interactive sessions, controlling how tool-use permissions are granted at startup (v1.0.81-6+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -448,6 +447,8 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+
+**Model data retention warnings** (v1.0.81-9+): The `/model` picker now displays data retention warnings alongside any model that has non-standard retention policies. Look for the warning indicator next to a model name in the picker — selecting it shows a direct link to the relevant policy documentation so you can make an informed choice before switching models.
 
 ### CLI Session Commands
 
@@ -783,6 +784,18 @@ copilot --config-dir ~/.my-copilot-config
 ```
 
 Set `COPILOT_HOME` in your shell profile to use a custom config directory across all sessions. This is especially useful when running multiple Copilot configurations for different projects or teams.
+
+The `--with-token` flag (v1.0.81-6+) lets you authenticate by reading a token from stdin, which is useful in CI environments or scripts where you want to pass credentials securely without interactive prompts:
+
+```bash
+echo "$GITHUB_TOKEN" | copilot login --with-token
+```
+
+### Session Restore on Startup
+
+*(v1.0.81-7+)* When you start Copilot CLI after a crash or machine restart, it automatically detects any sessions that were still open when the CLI exited unexpectedly. A prompt appears at startup asking whether you want to restore those sessions, so you can pick up exactly where you left off without manually reopening each terminal.
+
+If you don't want to restore a session, simply dismiss the prompt and start fresh. Restored sessions appear in the `/resume` picker as usual.
 
 ### Shell Completion
 

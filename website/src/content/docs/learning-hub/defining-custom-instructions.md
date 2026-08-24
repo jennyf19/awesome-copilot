@@ -3,7 +3,7 @@ title: 'Defining Custom Instructions'
 description: 'Learn how to create persistent, context-aware instructions that guide GitHub Copilot automatically across your codebase.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-01
+lastUpdated: 2026-08-24
 estimatedReadingTime: '8 minutes'
 tags:
   - instructions
@@ -311,6 +311,8 @@ A: If multiple instructions apply to the same file, Copilot considers all of the
 **Q: How do I know if my instructions are working?**
 
 A: Test by asking Copilot to generate code matching your patterns. If it follows your standards without explicit prompting, the instructions are effective. You can also reference the instruction explicitly in chat: "Following the TypeScript standards in my instructions, create a user component."
+
+In GitHub Copilot CLI (v1.0.81-6+), the `/instructions` slash command lists each loaded instruction file individually, so you can verify exactly which files are active in the current session.
 
 **Q: Should I document everything in instructions?**
 
