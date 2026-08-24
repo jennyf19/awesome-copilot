@@ -3,10 +3,7 @@ title: 'Getting Started with the GitHub Copilot app'
 description: 'Learn about the GitHub Copilot app, a desktop experience built for agent-native development. Understand its key features and who it''s for.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-17
-estimatedReadingTime: '8 minutes'
-tags:
-  - copilot-app
+lastUpdated: 2026-08-24
   - desktop
   - agents
   - parallel-work
@@ -88,6 +85,10 @@ For a hands-on guide to building canvases with `/create-canvas`, see [Working wi
 
 You control the automation level—decide whether Agent Merge should just run CI, address feedback, or go all the way to merging. It's a way to let Copilot handle the tedious parts of the review and merge process.
 
+### Voice Dictation
+
+*(v1.0.81-7+)* The Copilot app and CLI support voice dictation for hands-free input. Press **Ctrl+Space** to toggle voice dictation on or off. Speak your prompt, and it is transcribed and submitted automatically — useful when you want to describe a complex task without typing.
+
 ## Who is the Copilot app for?
 
 The Copilot app isn't a replacement for existing Copilot experiences—it's another tool in the toolbox. Here's who it serves best:
@@ -135,6 +136,14 @@ To use the GitHub Copilot app, you need:
 2. Install and launch the app
 3. Authenticate with your GitHub account
 4. Connect your repositories
+
+*(v1.0.81-7+)* If you already have GitHub Copilot CLI installed, you can open the Copilot app directly from your terminal in the current directory:
+
+```bash
+copilot app
+```
+
+This is useful when you're already working in the CLI and want to switch to the app's visual interface for managing parallel sessions or reviewing agent progress.
 
 ### Creating Your First Session
 

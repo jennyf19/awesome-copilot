@@ -3,10 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
-estimatedReadingTime: '8 minutes'
-tags:
-  - plugins
+lastUpdated: 2026-08-24
   - copilot-cli
   - fundamentals
 relatedArticles:
@@ -231,6 +228,18 @@ copilot --plugin-dir /path/to/my-plugin
 ```
 
 Plugins loaded this way appear in `/plugin list` under a separate **External Plugins** section, clearly distinguished from marketplace-installed plugins. This is useful for testing local plugins in development or loading private plugins that aren't published to any marketplace.
+
+*(v1.0.81-8+)* When a plugin is loaded from a local path-sourced marketplace, its content is read **live from its directory** on each `/restart` or new session. This means you can edit the plugin's agents, skills, or hooks and see your changes immediately without running `/plugin update`.
+
+### Discovering Skills and Agents from Additional Directories
+
+*(v1.0.81-8+)* The `--add-dir` flag tells Copilot CLI to scan additional directories for skills and custom agents at startup:
+
+```bash
+copilot --add-dir ~/my-shared-agents --add-dir ~/team-skills
+```
+
+This is useful when you maintain shared agent profiles or skills outside your project's `.github/` directory or `~/.copilot/` folder. Multiple `--add-dir` flags can be specified to include several directories at once.
 
 ### Where Plugins Are Stored
 
