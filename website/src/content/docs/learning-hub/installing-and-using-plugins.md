@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-25
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -311,5 +311,23 @@ A: The plugin's agents, skills, and hooks are removed from Copilot, and any cach
 - **Create Skills**: [Creating Effective Skills](../creating-effective-skills/) — Build skills that can be included in plugins
 - **Build Agents**: [Building Custom Agents](../building-custom-agents/) — Create agents to package in plugins
 - **Add Hooks**: [Automating with Hooks](../automating-with-hooks/) — Configure hooks for plugin automation
+- **VS Code Agent Plugins**: [Agent Plugins 1.0 documentation](https://code.visualstudio.com/docs/agent-customization/agent-plugins) — Package agents into VS Code extensions using the `com.github.copilot` namespace
+
+## VS Code Agent Plugins vs Copilot CLI Plugins
+
+With the release of **Agent Plugins 1.0** in VS Code 1.133, there are now two distinct plugin systems for GitHub Copilot customizations. Understanding the difference helps you choose the right packaging approach:
+
+| Aspect | Copilot CLI Plugins | VS Code Agent Plugins (1.0+) |
+|--------|--------------------|-----------------------------|
+| **Format** | `plugin.json` manifest | `package.json` `contributes.com.github.copilot` |
+| **Distribution** | Copilot plugin marketplace | VS Code Marketplace (as a VS Code extension) |
+| **Install command** | `copilot plugin install name@marketplace` | Extensions view `@agentPlugins` or Command Palette |
+| **Components** | Agents, skills, hooks, MCP/LSP servers, extensions | Agents, commands (slash commands), rules, hooks |
+| **Works with** | Copilot CLI, VS Code (via marketplace integration) | VS Code only |
+| **Best for** | Terminal workflows, cross-surface sharing, CLI teams | VS Code extension publishers, VS Code-first teams |
+
+In practice, most users will encounter **Copilot CLI plugins** through the marketplace, while **VS Code Agent Plugins** are primarily authored by VS Code extension developers who want to bundle Copilot customizations with their extension.
+
+If you are a **user** looking to enhance your Copilot setup, the marketplace-based CLI plugin approach described above is the recommended path. If you are a **VS Code extension developer**, see the [VS Code Agent Plugins documentation](https://code.visualstudio.com/docs/agent-customization/agent-plugins) to bundle agents with your extension.
 
 ---

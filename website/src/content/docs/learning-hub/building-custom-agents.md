@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-09
+lastUpdated: 2026-08-25
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -241,6 +241,64 @@ tools: ['codebase', 'terminal', 'postgres-mcp']
 
 The agent can then query your database, analyze query plans, and suggest optimizations—all within the conversation. For setup details, see [Understanding MCP Servers](../understanding-mcp-servers/).
 
+## VS Code Agent Plugins (Agent Plugins 1.0)
+
+VS Code 1.133 introduced **Agent Plugins 1.0**, a formal specification for packaging custom agents, commands, rules (instructions), and hooks into an installable VS Code plugin using the `com.github.copilot` namespace. This is the VS Code-native way to distribute agent customizations alongside your extension.
+
+> **Note**: VS Code Agent Plugins use a different format than Copilot CLI plugins (which use `plugin.json` and the marketplace install system). See [Installing and Using Plugins](../installing-and-using-plugins/) for the CLI plugin model.
+
+### Structure of a VS Code Agent Plugin
+
+VS Code agent plugins are defined in a `package.json` contribution point using the `com.github.copilot` namespace:
+
+```json
+{
+  "contributes": {
+    "com.github.copilot": {
+      "agents": ["./agents/my-agent.md"],
+      "commands": ["./commands/my-command.md"],
+      "rules": ["./rules/coding-standards.md"],
+      "hooks": ["./hooks/pre-commit.json"]
+    }
+  }
+}
+```
+
+Each component type maps directly to its Copilot equivalent:
+
+| VS Code Plugin Field | Copilot Equivalent | Description |
+|---------------------|-------------------|-------------|
+| `agents` | `.agent.md` files | Custom agent personas and tool configurations |
+| `commands` | Slash commands | Custom slash commands available in chat |
+| `rules` | `.instructions.md` files | Instructions applied to matching files |
+| `hooks` | `hooks.json` | Event handlers for agent lifecycle events |
+
+### When to Use VS Code Agent Plugins
+
+Use VS Code Agent Plugins when you are:
+- **Shipping a VS Code extension** and want to bundle Copilot customizations with it
+- **Distributing domain-specific agents** through the VS Code Marketplace
+- **Enforcing team standards** via an organization-distributed extension
+
+For project-level customizations (available to all Copilot surfaces including the coding agent), continue placing agents in `.github/agents/` and skills in `.github/skills/`.
+
+### Mixing Models in Claude Sessions *(VS Code 1.133+)*
+
+When your primary session model is a Claude model, VS Code now lets you mix in Copilot-hosted models for specific agents or subagents. This means a coordinator agent running on Claude can delegate to a worker agent running on GPT-4.1—all within the same session. Configure the worker agent's model in its frontmatter as usual:
+
+```yaml
+---
+name: 'Fast Formatter'
+model: GPT-4.1-mini
+description: 'Rapid code formatting checks—uses a fast model for cost efficiency'
+tools: ['edit']
+---
+```
+
+### Agent Host and Copilot SDK *(VS Code 1.134+)*
+
+VS Code 1.134 aligns the **agent host** behavior with the **Copilot SDK**, ensuring that agents built for VS Code follow consistent lifecycle and capability contracts. If you are building tools that integrate with GitHub Copilot programmatically (for example, a CI pipeline or IDE plugin), the [Copilot SDK](https://code.visualstudio.com/docs/agents/concepts/agent-host) provides the canonical interface for invoking agents, streaming responses, and receiving structured results.
+
 ## Best Practices
 
 ### Writing Effective Agent Personas
@@ -319,5 +377,7 @@ A: Yes, when defining output format or coding patterns. Show what you expect the
 - **Connect External Tools**: [Understanding MCP Servers](../understanding-mcp-servers/) — Give agents access to databases, APIs, and more
 - **Automate with Coding Agent**: [Using the Copilot Coding Agent](../using-copilot-coding-agent/) — Run agents autonomously on issues
 - **Add Reusable Tasks**: [Creating Effective Skills](../creating-effective-skills/) — Build tasks agents can discover and invoke
+- **VS Code Agent Plugins**: [VS Code Agent Plugins documentation](https://code.visualstudio.com/docs/agent-customization/agent-plugins) — Package agents into VS Code extensions using the `com.github.copilot` namespace
+- **Agent Host and Copilot SDK**: [Agent host concepts](https://code.visualstudio.com/docs/agents/concepts/agent-host) — Understand how VS Code hosts agents and integrates with the Copilot SDK
 
 ---

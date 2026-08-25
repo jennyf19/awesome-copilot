@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-01
+lastUpdated: 2026-08-25
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -108,6 +108,14 @@ Then summarize the findings into one recommendation.
 ### 4. Know the nesting rule
 
 By default, subagents do not keep spawning additional subagents. In VS Code, recursive delegation is controlled by the `chat.subagents.allowInvocationsFromSubagents` setting, which is off by default.
+
+### 5. View subagent chats in a grid *(VS Code 1.134+)*
+
+VS Code 1.134 introduced a **grid layout** for chat sessions, letting you view multiple subagent chats side-by-side in a single window. When the coordinator launches parallel subagents, each gets its own panel in the grid — so you can monitor multiple work tracks at a glance without switching tabs.
+
+You can also use the **prompt timeline** to navigate back through earlier prompts and inspect which files changed at each step, which is useful for understanding the sequence of work in a long orchestrated session. And **Find in Chat** (`Ctrl+F` / `Cmd+F` in the chat panel) lets you search the full conversation transcript across all turns.
+
+These features are available in VS Code 1.134+. See the [VS Code 1.134 release notes](https://code.visualstudio.com/updates/v1_134) for details.
 
 ## Launch subagents in Copilot CLI
 
@@ -217,5 +225,6 @@ Yes. In v1.0.66+, usage-based billing users can configure **subagent concurrency
 - Read [Building Custom Agents](../building-custom-agents/) to design coordinator and worker agents.
 - Revisit [What are Agents, Skills, and Instructions](../what-are-agents-skills-instructions/) for the broader customization model.
 - Keep the [GitHub Copilot Terminology Glossary](../github-copilot-terminology-glossary/) nearby when comparing terminology across products.
+- Review the [VS Code 1.134 release notes](https://code.visualstudio.com/updates/v1_134) for the grid layout, prompt timeline, and find-in-chat features for subagent sessions.
 
 ---
