@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-26
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -231,6 +231,8 @@ copilot --plugin-dir /path/to/my-plugin
 ```
 
 Plugins loaded this way appear in `/plugin list` under a separate **External Plugins** section, clearly distinguished from marketplace-installed plugins. This is useful for testing local plugins in development or loading private plugins that aren't published to any marketplace.
+
+**Live reload for path-sourced plugins** *(v1.0.81+)*: When loading a plugin from a local directory, edits to the plugin take effect on `/restart` or in a new session — you no longer need to run `/plugin update`. This makes local plugin development significantly faster: edit your plugin files, restart, and the changes are live immediately.
 
 ### Where Plugins Are Stored
 

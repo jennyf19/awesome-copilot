@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-26
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -429,6 +429,8 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `defaultMode` | Choose the startup mode for new interactive sessions (`interactive`, `plan`, `autopilot`) (v1.0.81+) |
+| `defaultPermissionMode` | Choose the default approval behavior for new interactive sessions (`auto`, `allow-all`, `manual`) (v1.0.81+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -733,6 +735,16 @@ The `-C <directory>` flag changes the working directory before starting, similar
 copilot -C ~/projects/my-repo          # start in a different directory
 copilot -C ~/projects/my-repo -p "..."  # combine with prompt mode
 ```
+
+The `--add-dir` flag *(v1.0.81+)* adds an extra directory from which Copilot CLI discovers custom agents and skills. Skills and agents in the specified directory are loaded alongside those from your repository and user configuration:
+
+```bash
+copilot --add-dir ~/shared-agents     # load agents and skills from a shared directory
+```
+
+This is useful for teams that maintain a central set of agents and skills outside any single repository — for example, a shared company-wide agents directory that everyone loads without installing a plugin.
+
+**Startup session restore** *(v1.0.81+)*: When Copilot CLI starts, it offers to restore any sessions that were still open when a previous CLI instance exited unexpectedly (e.g., due to a crash or machine restart). This means you no longer lose in-progress sessions to unexpected shutdowns.
 
 The `--mode` flag (along with its aliases `--autopilot` and `--plan`) lets you launch the CLI directly in a specific agent mode without waiting for the interactive session to start:
 
