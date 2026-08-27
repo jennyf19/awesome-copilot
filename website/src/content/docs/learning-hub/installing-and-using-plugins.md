@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-27
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -222,9 +222,23 @@ copilot plugin marketplace update
 copilot plugin uninstall my-plugin
 ```
 
-### Loading Plugins from a Local Directory
+*(v1.0.81+)* **Update notifications**: The `/plugin` dashboard flags installed plugins and marketplaces that have a newer version available upstream and offers an **Update** action to pull the latest version. You no longer need to manually check for updates — the dashboard surfaces them automatically.
 
-You can load plugins directly from a local directory without installing them from a marketplace, using the `--plugin-dir` flag when starting Copilot:
+### Unified Plugin Dashboard
+
+*(v1.0.81+)* Run `/plugin`, `/mcp`, or `/skills` from within an interactive Copilot session to open the **unified plugin dashboard**, which shows all installed plugins, available MCP servers, and skills in one place. This replaces the older `/plugins` command (which has been removed). Plugin-related resources are now split across focused commands:
+
+| Command | What It Shows |
+|---------|---------------|
+| `/plugin` | Installed plugins and marketplace update status |
+| `/mcp` | MCP server status, configuration, and connection health |
+| `/skills` | Available skills from plugins and local directories |
+| `/subagents` | Available custom agents from plugins |
+| `/instructions` | User instruction files |
+
+> **Note**: The `/plugins` command was removed in v1.0.81. Use `/plugin`, `/mcp`, and `/skills` instead.
+
+### Loading Plugins from a Local Directory
 
 ```bash
 copilot --plugin-dir /path/to/my-plugin

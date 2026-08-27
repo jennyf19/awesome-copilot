@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-27
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -156,6 +156,28 @@ When hooks are defined inside a **plugin**, the hook scripts receive two additio
 |----------|-------------|
 | `CLAUDE_PROJECT_DIR` | The path to the current project (working) directory |
 | `CLAUDE_PLUGIN_DATA` | The path to a persistent data directory scoped to the plugin |
+
+### OpenTelemetry Trace Context (v1.0.81+)
+
+Hooks can now receive and emit **OpenTelemetry trace context**, enabling correlated observability across Copilot operations and your own monitoring infrastructure.
+
+When a hook fires, the input includes a `traceparent` field (and `tracestate` when the span carries vendor state). **Command hooks** also receive these as environment variables (`TRACEPARENT`, `TRACESTATE`). Your hook scripts can forward these to downstream services or use them to emit correlated spans to your observability platform:
+
+```bash
+#!/usr/bin/env bash
+# Forward trace context to your observability collector
+INPUT=$(cat)
+TRACEPARENT="${TRACEPARENT:-$(echo "$INPUT" | jq -r '.traceparent // empty')}"
+
+if [ -n "$TRACEPARENT" ]; then
+  curl -s -X POST https://your-collector/spans \
+    -H "traceparent: $TRACEPARENT" \
+    -H "Content-Type: application/json" \
+    -d "{\"event\": \"hook.fired\", \"type\": \"postToolUse\"}"
+fi
+```
+
+This is particularly valuable when Copilot is part of a larger automated workflow and you want end-to-end distributed tracing across AI-generated actions and your own services.
 
 You can also use these as **template variables** directly in the `bash` or `powershell` fields of your `hooks.json` configuration:
 
