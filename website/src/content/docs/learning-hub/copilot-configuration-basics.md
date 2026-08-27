@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-27
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -429,6 +429,8 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `defaultMode` | Default agent mode for new interactive sessions: `agent`, `autopilot`, or `plan` (v1.0.81+) |
+| `defaultPermissionMode` | Default permission approval behavior for new sessions: `default`, `auto`, or `allow-all` (v1.0.81+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -446,6 +448,8 @@ These files follow the same format as `config.json` and are loaded after the glo
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
+
+*(v1.0.81+)* **Auto mode now adapts model selection as your task evolves during a conversation** — not just at the start of each turn, but as context changes mid-conversation. This means the model selected for a follow-up question may differ from the one used for the initial request, because the routing engine responds to the evolving complexity and context of the task.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
 
@@ -494,6 +498,8 @@ You can also name a session at startup with the `--name` flag, and resume it by 
 copilot --name "auth-refactor"          # start a session with a given name
 copilot --resume="auth-refactor"        # resume that session by name
 ```
+
+*(v1.0.81+)* **Session restore on startup**: When Copilot CLI starts, it detects sessions that were still open when the previous CLI instance exited (e.g., from a crash or machine restart). You are offered the option to restore those sessions so you can pick up where you left off — no need to manually reopen each terminal or retrace your previous context.
 
 The `/session delete` command removes sessions you no longer need:
 
@@ -783,6 +789,22 @@ copilot --config-dir ~/.my-copilot-config
 ```
 
 Set `COPILOT_HOME` in your shell profile to use a custom config directory across all sessions. This is especially useful when running multiple Copilot configurations for different projects or teams.
+
+The `copilot app` command *(v1.0.81+)* opens the GitHub Copilot app in the context of the current directory:
+
+```bash
+copilot app
+```
+
+This is a quick shortcut to jump from the CLI into the GitHub Copilot web app, with the current repository context automatically applied.
+
+The `--with-token` flag for `copilot login` *(v1.0.81+)* reads an authentication token from stdin, allowing headless or scripted login flows:
+
+```bash
+echo "$MY_TOKEN" | copilot login --with-token
+```
+
+This is useful in CI/CD pipelines or automated environments where interactive browser-based login is not possible.
 
 ### Shell Completion
 
