@@ -3,10 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
-estimatedReadingTime: '8 minutes'
-tags:
-  - hooks
+lastUpdated: 2026-08-28
   - automation
   - fundamentals
 relatedArticles:
@@ -175,6 +172,29 @@ You can also use these as **template variables** directly in the `bash` or `powe
 ```
 
 This makes it straightforward to write plugin hooks that are portable across machines and projects without hardcoding paths.
+
+### OpenTelemetry Trace Context *(v1.0.81+)*
+
+Hooks receive the current **OpenTelemetry trace context** from the agent session. This lets you emit correlated spans from your hook scripts and connect them to your existing observability infrastructure.
+
+**What hooks receive**:
+- `traceparent` — the W3C `traceparent` header value for the current trace span
+- `tracestate` — the W3C `tracestate` header value (when vendor-specific trace state is present)
+- Command hooks also receive `TRACEPARENT` and `TRACESTATE` as environment variables
+
+```bash
+#!/usr/bin/env bash
+# Use traceparent to emit a correlated span to your observability backend
+INPUT=$(cat)
+TRACEPARENT=$(echo "$INPUT" | jq -r '.traceparent // empty')
+
+# Pass the trace context to your monitoring tool
+otel-cli span create \
+  --name "copilot-hook-check" \
+  --traceparent "$TRACEPARENT"
+```
+
+This is particularly useful for teams that trace their CI/CD pipelines and want Copilot agent activity to appear as correlated work in the same trace.
 
 ### Event Configuration
 

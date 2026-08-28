@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-28
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -100,6 +100,18 @@ Plugins are collected in **marketplaces** — registries you can browse and inst
 - **`copilot-plugins`** — Official GitHub Copilot plugins
 - **`awesome-copilot`** — Community-contributed plugins from this repository
 
+### The Plugins Dashboard
+
+*(v1.0.81+)* GitHub Copilot CLI includes a unified **Plugins Dashboard** that lets you manage plugins, MCP servers, skills, agents, and instructions—all from one place. Open it from an interactive session using any of these commands:
+
+```
+/plugin    — browse and manage plugins
+/mcp       — browse MCP servers and configure them
+/skills    — browse available skills
+```
+
+The dashboard shows what's installed, flags plugins that have a newer version available upstream, and offers an **Update** action directly from the interface. There is no separate `/plugins` command—each of the above commands opens the relevant tab of the dashboard.
+
 ### Browsing in Copilot CLI
 
 List your registered marketplaces:
@@ -159,6 +171,24 @@ To automatically register an additional marketplace for everyone working in a re
 ```
 
 With this in place, team members automatically get the `my-org-plugins` marketplace available without running a separate `marketplace add` command. This replaces the older `marketplaces` setting, which was removed in v1.0.16.
+
+#### Auto-updating a Marketplace
+
+*(v1.0.79+)* Add `"autoUpdate": true` to automatically pull the latest plugin catalog from a marketplace at the start of each session:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-org-plugins",
+      "source": "my-org/internal-plugins",
+      "autoUpdate": true
+    }
+  ]
+}
+```
+
+This keeps your team's plugin list fresh without running `copilot plugin marketplace update` manually.
 
 ### Pinning a Marketplace to a Specific Commit
 
