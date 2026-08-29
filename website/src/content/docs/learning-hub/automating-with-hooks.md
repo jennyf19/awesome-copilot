@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-29
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -175,6 +175,15 @@ You can also use these as **template variables** directly in the `bash` or `powe
 ```
 
 This makes it straightforward to write plugin hooks that are portable across machines and projects without hardcoding paths.
+
+### OpenTelemetry Trace Context (v1.0.81+)
+
+Hooks can now participate in distributed tracing. When a hook fires, the CLI passes the current OpenTelemetry trace context so your hook scripts can emit correlated spans and trace your automation alongside the CLI's own telemetry:
+
+- **All hook types**: The JSON input passed to hook scripts gains a `traceparent` field containing the W3C trace context header value. If the current span also has vendor-specific trace state, a `tracestate` field is included.
+- **Command hooks**: In addition to the JSON input fields, command hooks also receive `TRACEPARENT` and `TRACESTATE` as environment variables, making it easy to pass them to tools that read W3C trace context from the environment.
+
+This lets you build observability pipelines where CI gates, linting runs, and security checks all appear as correlated child spans in your distributed tracing backend.
 
 ### Event Configuration
 
