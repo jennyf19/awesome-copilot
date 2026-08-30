@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-30
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -139,6 +139,30 @@ EOF
 ```
 
 > **How it works**: If your hook writes `{"additionalContext": "..."}` to stdout and exits with code `0`, the text is prepended to the model prompt for this turn. The hook can also write both `additionalContext` and `response` — if `response` is present, that wins and the model call is skipped.
+
+### OpenTelemetry Trace Context (v1.0.81+)
+
+Hooks can now participate in distributed tracing. Each hook invocation receives the current OpenTelemetry trace context so your hook scripts can emit **correlated spans** that link back to the Copilot session that triggered them.
+
+**Standard hook inputs** (`preToolUse`, `postToolUse`, `agentStop`, etc.) gain a `traceparent` field in their JSON input, and a `tracestate` field when the span carries vendor-specific state:
+
+```json
+{
+  "hookType": "postToolUse",
+  "toolName": "edit",
+  "traceparent": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
+  "tracestate": "vendor=value"
+}
+```
+
+**Command hooks** also receive the trace context as environment variables:
+
+| Variable | Description |
+|----------|-------------|
+| `TRACEPARENT` | W3C `traceparent` header value for the current span |
+| `TRACESTATE` | W3C `tracestate` header value (present only when the span has vendor state) |
+
+This enables your hook scripts to forward spans to any OpenTelemetry-compatible backend (Jaeger, Zipkin, Honeycomb, Datadog, etc.) correlated with the agent activity that triggered them — useful for audit trails, performance monitoring, and governance dashboards.
 
 ### Extension Hooks Merging
 
