@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-09-22
+lastUpdated: 2026-11-09
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -938,6 +938,16 @@ Run `/config` to open a dedicated sidebar configuration screen inside the CLI, g
 ### Sandbox Session Control
 
 `/sandbox` can keep sandboxing enabled for the current session only, without changing your global setting. Sandboxed commands can use `HTTPS_PROXY` and `HTTP_PROXY` for host-rule traffic when no sandbox proxy is configured, and sandboxed git on github.com can use a `GITHUB_TOKEN` supplied through `credentials.envVars`. When sandboxed commands inherit your host proxy settings, `NO_PROXY` and `ALL_PROXY` are honored too.
+
+On Windows, `sandbox.userPolicy.filesystem.enumeratePaths` in `settings.json` grants enumerate-only access to directories (listing entries without reading contents). With the sandbox on, a running local MCP server is restarted after `/cd` so it follows the new directory's denied paths.
+
+### Repository Indexing
+
+Use the `/index` commands to manage code indexing for the current repository. Managed shared tgrep indexing is enabled by default for eligible repositories, which speeds up code search without any setup.
+
+### Disabling Skills
+
+Entries in `disabledSkills`, and the `skills.disable` and `skills.enable` settings, match skill names case-insensitively, just as invoking a skill does.
 
 ### Assisted Permissions Guidance
 
