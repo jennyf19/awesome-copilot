@@ -939,6 +939,8 @@ Run `/config` to open a dedicated sidebar configuration screen inside the CLI, g
 
 `/sandbox` can keep sandboxing enabled for the current session only, without changing your global setting. Sandboxed commands can use `HTTPS_PROXY` and `HTTP_PROXY` for host-rule traffic when no sandbox proxy is configured, and sandboxed git on github.com can use a `GITHUB_TOKEN` supplied through `credentials.envVars`. When sandboxed commands inherit your host proxy settings, `NO_PROXY` and `ALL_PROXY` are honored too.
 
+Sandbox host allow and deny rules in settings accept IPv4 and IPv6 CIDR ranges (for example `10.0.0.0/8`), so you can permit or block whole networks without listing each host.
+
 On Windows, `sandbox.userPolicy.filesystem.enumeratePaths` in `settings.json` grants enumerate-only access to directories (listing entries without reading contents). With the sandbox on, a running local MCP server is restarted after `/cd` so it follows the new directory's denied paths.
 
 ### Repository Indexing
