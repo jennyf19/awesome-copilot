@@ -701,11 +701,13 @@ The `/env` command shows all loaded environment details — instructions, MCP se
 /env
 ```
 
-The `/context` command shows a visualization of the current conversation's context window usage — how many tokens are consumed and how much headroom remains:
+The `/context` command shows a visualization of the current conversation's context window usage — how many tokens are consumed and how much headroom remains. Loaded custom instructions appear as their own token count rather than being folded into the System Prompt total:
 
 ```
 /context
 ```
+
+To read a single setting, including JSON-valued ones such as hook definitions, run `copilot config <key>` or `/settings show <key>`.
 
 The `/usage` command displays session metrics such as the number of tokens consumed, API calls made, and any quota information for the current session, including per-model token totals when you have used multiple models in a session:
 
