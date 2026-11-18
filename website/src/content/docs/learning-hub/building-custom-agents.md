@@ -38,7 +38,7 @@ When a user selects a custom agent in VS Code or assigns it to an issue via the 
 - Agents persist across a conversation—they maintain their persona and context
 - Agents can invoke tools, run commands, search codebases, and interact with MCP servers
 - Multiple agents can coexist in a repository, each serving different workflows
-- Agents are stored in `.github/agents/` and are shared with the entire team
+- Agents are stored in `.github/agents/` and are shared with the entire team; Copilot CLI picks up agents added there during a session without reloading
 
 ### How Agents Differ from Other Customizations
 
