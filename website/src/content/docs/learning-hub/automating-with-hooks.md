@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-09-22
+lastUpdated: 2026-11-19
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -122,6 +122,8 @@ EOF
 
 The `userPromptSubmitted` hook also supports the `additionalContext` field. When your hook returns `{"additionalContext": "..."}`, that text is **injected into the model-facing prompt** before the model processes the user's message. This is distinct from the `response` field (which bypasses the model entirely) — here the model still runs, but with extra context prepended.
 
+When several `userPromptSubmitted` hooks return `additionalContext`, the context from every hook reaches the model, not just the last one.
+
 This is useful for per-prompt enrichment: adding the current git diff, environment state, or dynamic instructions that should influence the model's response for this specific request.
 
 ```bash
@@ -173,6 +175,8 @@ You can also use these as **template variables** directly in the `bash` or `powe
   }
 }
 ```
+
+Plugin hooks can also use `${COPILOT_PLUGIN_ROOT}` in their working directory and environment values; it expands to the plugin's root directory.
 
 This makes it straightforward to write plugin hooks that are portable across machines and projects without hardcoding paths.
 

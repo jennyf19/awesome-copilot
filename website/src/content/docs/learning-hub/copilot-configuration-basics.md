@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-09-22
+lastUpdated: 2026-11-09
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -455,7 +455,7 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Auto mode and server-side model routing**: When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
-**Model family aliases**: Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string. Current models include **Claude Opus 5** and **Claude Fable 5.1** (Anthropic), **Grok 4.5** and **Grok 4.6** (xAI, with `xhigh` reasoning effort support), **Gemini 3.7 Flash** (Google), and **GPT-6 Astra** (OpenAI). The model picker also periodically retires older models no longer worth recommending, so don't be surprised if a model you previously pinned disappears from the list — check [Compatibility and Migration Notes](#compatibility-and-migration-notes) if that happens.
+**Model family aliases**: Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string. Current models include **Claude Opus 5**, **Claude Fable 5.1**, and **Claude Fable 5.2** (Anthropic), **Grok 4.5** and **Grok 4.6** (xAI, with `xhigh` reasoning effort support), **Gemini 3.7 Flash** (Google), and **GPT-6 Astra** (OpenAI). The model picker also periodically retires older models no longer worth recommending, so don't be surprised if a model you previously pinned disappears from the list — check [Compatibility and Migration Notes](#compatibility-and-migration-notes) if that happens.
 
 **Model fallback lists**: Custom agents can set `model` to a list of several models instead of a single name. Copilot tries each one in order until it finds one available to your account — useful when your preferred model is temporarily rate-limited or not enrolled. Pair this with `model-policy: required` to keep the agent restricted to that list even if you try to switch models mid-session. See [Building Custom Agents](../building-custom-agents/) for the frontmatter syntax.
 
@@ -701,11 +701,13 @@ The `/env` command shows all loaded environment details — instructions, MCP se
 /env
 ```
 
-The `/context` command shows a visualization of the current conversation's context window usage — how many tokens are consumed and how much headroom remains:
+The `/context` command shows a visualization of the current conversation's context window usage — how many tokens are consumed and how much headroom remains. Loaded custom instructions appear as their own token count rather than being folded into the System Prompt total:
 
 ```
 /context
 ```
+
+To read a single setting, including JSON-valued ones such as hook definitions, run `copilot config <key>` or `/settings show <key>`.
 
 The `/usage` command displays session metrics such as the number of tokens consumed, API calls made, and any quota information for the current session, including per-model token totals when you have used multiple models in a session:
 
@@ -938,6 +940,18 @@ Run `/config` to open a dedicated sidebar configuration screen inside the CLI, g
 ### Sandbox Session Control
 
 `/sandbox` can keep sandboxing enabled for the current session only, without changing your global setting. Sandboxed commands can use `HTTPS_PROXY` and `HTTP_PROXY` for host-rule traffic when no sandbox proxy is configured, and sandboxed git on github.com can use a `GITHUB_TOKEN` supplied through `credentials.envVars`. When sandboxed commands inherit your host proxy settings, `NO_PROXY` and `ALL_PROXY` are honored too.
+
+Sandbox path settings can reference environment variables. Sandbox host allow and deny rules in settings accept IPv4 and IPv6 CIDR ranges (for example `10.0.0.0/8`), so you can permit or block whole networks without listing each host.
+
+On Windows, `sandbox.userPolicy.filesystem.enumeratePaths` in `settings.json` grants enumerate-only access to directories (listing entries without reading contents). With the sandbox on, a running local MCP server is restarted after `/cd` so it follows the new directory's denied paths.
+
+### Repository Indexing
+
+Use the `/index` commands to manage code indexing for the current repository. Managed shared tgrep indexing is enabled by default for eligible repositories, which speeds up code search without any setup.
+
+### Disabling Skills
+
+Entries in `disabledSkills`, and the `skills.disable` and `skills.enable` settings, match skill names case-insensitively, just as invoking a skill does.
 
 ### Assisted Permissions Guidance
 
