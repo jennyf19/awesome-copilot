@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-11-09
+lastUpdated: 2026-11-24
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -466,6 +466,8 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 /model --plan claude-haiku   # set a specific model for plan mode
 /model --plan off            # clear the plan-mode model (revert to session model)
 ```
+
+In `/model`, press **Ctrl+X** then **A** to add (and optionally switch to) a custom provider model in local sessions, and manage configured provider models directly from the picker. Set `showTimelineTimestamps` to show start times, end times, and elapsed durations on timeline items.
 
 When you leave plan mode, the CLI automatically reverts to your session model. This pairing works well with repository model pinning — you can enforce a high-quality model for implementation while allowing a lighter model during exploration and planning.
 
@@ -944,6 +946,8 @@ Run `/config` to open a dedicated sidebar configuration screen inside the CLI, g
 Sandbox path settings can reference environment variables. Sandbox host allow and deny rules in settings accept IPv4 and IPv6 CIDR ranges (for example `10.0.0.0/8`), so you can permit or block whole networks without listing each host.
 
 On Windows, `sandbox.userPolicy.filesystem.enumeratePaths` in `settings.json` grants enumerate-only access to directories (listing entries without reading contents). With the sandbox on, a running local MCP server is restarted after `/cd` so it follows the new directory's denied paths.
+
+Windows sandbox package queries are on by default; set `sandbox.userPolicy.capabilities` to `[]` to opt out. On macOS, `sandbox.userPolicy.seatbelt.extraMachLookups` allows specific Mach service lookups in sandboxed commands without enabling Keychain access. `/sandbox policy` shows which GitHub account sandboxed `gh` commands use.
 
 ### Repository Indexing
 
