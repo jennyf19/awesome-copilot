@@ -110,6 +110,8 @@ tools: ['codebase', 'terminal', 'github']
 
 For MCP server tools, reference them by server name (e.g., `postgres`, `docker`). See [Understanding MCP Servers](../understanding-mcp-servers/) for details.
 
+In Copilot CLI, subagents respect the tool list in their custom agent file, even when the file has no prompt body, and custom agents can opt in to additional tools through explicit tool exposure.
+
 ### Agent Instructions
 
 After the frontmatter, write Markdown instructions that define the agent's behavior. Structure these clearly:

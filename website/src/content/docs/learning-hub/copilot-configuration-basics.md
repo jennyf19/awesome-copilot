@@ -947,7 +947,15 @@ Sandbox path settings can reference environment variables. Sandbox host allow an
 
 On Windows, `sandbox.userPolicy.filesystem.enumeratePaths` in `settings.json` grants enumerate-only access to directories (listing entries without reading contents). With the sandbox on, a running local MCP server is restarted after `/cd` so it follows the new directory's denied paths.
 
-Windows sandbox package queries are on by default; set `sandbox.userPolicy.capabilities` to `[]` to opt out. On macOS, `sandbox.userPolicy.seatbelt.extraMachLookups` allows specific Mach service lookups in sandboxed commands without enabling Keychain access. `/sandbox policy` shows which GitHub account sandboxed `gh` commands use.
+Windows sandbox package queries are on by default; set `sandbox.userPolicy.capabilities` to `[]` to opt out. On macOS, `sandbox.userPolicy.seatbelt.extraMachLookups` allows specific Mach service lookups in sandboxed commands without enabling Keychain access. `/sandbox policy` shows which GitHub account sandboxed `gh` commands use. To trust custom CA certificates for sandboxed commands behind a TLS-intercepting proxy, set `sandbox.userPolicy.network.extraCaCertificates` in user or managed settings.
+
+### Environment Variables for Every Process
+
+The `env` setting defines environment variables for every process Copilot starts — shell commands, local LSP and MCP servers, hooks, and extensions — with or without the sandbox. When a plugin and a standalone MCP server connect to the same endpoint, Copilot warns you and `/mcp` shows how to disable one. MCP server names are matched case-insensitively in `/mcp` commands and `--disable-mcp-server`, with exact matches taking precedence.
+
+### Timeline Timestamps
+
+Turn on the `showTimelineTimestamps` setting to show start times, end times, and elapsed durations on timeline items.
 
 ### Repository Indexing
 
