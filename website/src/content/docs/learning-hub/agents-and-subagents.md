@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-09-12
+lastUpdated: 2026-11-15
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -156,6 +156,12 @@ The **complementary model strategy** lets you specify that the rubber-duck agent
 Because it runs as a sub-agent layer rather than replacing your primary model, you keep your current session model and context while the rubber-duck analysis runs in the background.
 
 > **Note**: This is an experimental feature and may change. Provide feedback via `/feedback` if you find it useful.
+
+### Configure subagents and budgets
+
+Use `/subagents` to turn individual subagents on or off and choose a model for each one. The panel lists custom agents (including those marked `user-invocable: false`) and shows agent IDs when several custom agents share a name. Built-in agent names are protected, so a custom agent with a built-in name does not appear there and cannot change built-in settings.
+
+Subagents count against the session-wide AI credit limit set with `--max-ai-credits`, so delegating work does not bypass your budget.
 
 ## Orchestration patterns that work well
 

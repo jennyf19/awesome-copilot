@@ -142,6 +142,8 @@ Or from a local path:
 copilot plugin marketplace add /path/to/local-marketplace
 ```
 
+Relative paths such as `./name`, `../name`, and `~/name` are also treated as local marketplace directories rather than GitHub repositories. Team plugins can be installed from marketplaces on a specific branch or tag, or in a repository subfolder.
+
 ### Sharing Marketplace Registrations Across a Team
 
 To automatically register an additional marketplace for everyone working in a repository, add an `extraKnownMarketplaces` entry to your `.github/copilot-settings.json` (or `config.json`):
